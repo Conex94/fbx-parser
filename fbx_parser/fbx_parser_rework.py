@@ -116,99 +116,6 @@ class FbxParser:
             print(theindex)
             raise e
 
-    def animated_deformer_to_animation_data(self, defs : list()):
-        '''
-        Take the animated deformers and create a list of animation with channels from it
-
-        :param defs: Animated deformer data
-        :return list of JointAnimationData:
-        '''
-
-        print('Converting animated Transformer to animation data')
-
-        try:
-            j_anim_data = list()
-
-            for i in range(0, defs.__len__()):
-                data_single = JointAnimationData()
-
-                data_single.jointName = defs[i].deformername
-                data_single.translate_x = defs[i].channeltranslate.channelx.keyvalues
-                data_single.translate_x_key = defs[i].channeltranslate.channelx.keydistances
-
-                data_single.translate_y = defs[i].channeltranslate.channely.keyvalues
-                data_single.translate_y_key = defs[i].channeltranslate.channely.keydistances
-
-                data_single.translate_z = defs[i].channeltranslate.channelz.keyvalues
-                data_single.translate_z_key = defs[i].channeltranslate.channelz.keydistances
-
-
-                data_single.rotate_x = defs[i].channelrotate.channelx.keyvalues
-                data_single.rotate_x_key = defs[i].channelrotate.channelx.keydistances
-
-                data_single.rotate_y = defs[i].channelrotate.channely.keyvalues
-                data_single.rotate_y_key = defs[i].channelrotate.channely.keydistances
-
-                data_single.rotate_z = defs[i].channelrotate.channelz.keyvalues
-                data_single.rotate_z_key = defs[i].channelrotate.channelz.keydistances
-
-
-                data_single.scale_x = defs[i].channelscale.channelx.keyvalues
-                data_single.scale_x_key = defs[i].channelscale.channelx.keydistances
-
-                data_single.scale_y = defs[i].channelscale.channely.keyvalues
-                data_single.scale_y_key = defs[i].channelscale.channely.keydistances
-
-                data_single.scale_z = defs[i].channelscale.channelz.keyvalues
-                data_single.scale_z_key = defs[i].channelscale.channelz.keydistances
-
-                j_anim_data.append(data_single)
-
-            print('Succesfully created JointAnimationDataList.')
-            return j_anim_data
-
-        except Exception as e:
-            print('Failed to create JointAnimationDataList')
-            raise e
-
-    def create_connections(self, cons : list()):
-        '''
-        Create connections list from the connections string array
-
-        :param cons:
-        :return list of Connection objects:
-        '''
-        try:
-            print("Starting to create Connections list from Connection list as String")
-
-            connections = list()
-
-            for line in cons:
-                if line.strip().startswith("Connect: "):
-                    if "Deformer::" in line or "SubDeformer::" in line:
-                        continue
-
-                    con = Connection()
-                    thisline = line.strip()[8:]
-                    splited = thisline.split(",")
-
-                    splited[0] = splited[0].strip()[1: splited[0].__len__() - 2]
-                    splited[1] = splited[1].strip()[1: splited[1].__len__() - 2]
-                    splited[2] = splited[2].strip()[1: splited[2].__len__() - 2]
-
-                    con.child = splited[2]
-                    con.parent = splited[1]
-
-                    connections.append(con)
-
-            print("Succesfully created Connections list")
-            return connections
-
-        except Exception as e:
-            print('Failed to create connections list')
-            raise e
-
-
     def _extractkeys(self, lines : list()):
         '''
         Extract keys, convert from... microseconds? to frames
@@ -612,7 +519,6 @@ class FbxParser:
 
         return deformer
 
-
     def _get_mesh_name(self, meshlines : list()) -> str():
         '''
         Get the name of the mesh
@@ -861,7 +767,6 @@ class FbxParser:
 
         return conn_new
 
-
     def _parse_take(self, lines: list()):
         '''
         Get take lines from fbx lines
@@ -1054,7 +959,7 @@ class FbxParser:
         deformers = list()
 
         for def_single in defs:
-            print(def_single['lines'])
+            #print(def_single['lines'])
             deformer = {'transform': [], 'name': '', 'weights' : [], 'indexes' : [], 'transformlink' : []}
 
             indices_line = ""
@@ -1071,6 +976,8 @@ class FbxParser:
                     deformer['name'] = line[10:].strip().split(' ')[1]
                     namelen_minus_two = deformer['name'].__len__() -2
                     deformer['name'] = deformer['name'][1:namelen_minus_two]
+
+
 
                 if line.strip().startswith('Transform: '):
                     read_trans_lines = True
@@ -1137,7 +1044,6 @@ class FbxParser:
 
         return deformers
 
-
     def _get_mesh_lines(self, lines):
         '''
         This function will only parse static mesh
@@ -1192,49 +1098,55 @@ class FbxParser:
 
         connectionsDict     = self._get_connections(lines)
 
-        deformers           = self.makedeformers(deformerNodes_seperated)
 
-    def convert_mesh(self, lines):
+    def _convert_auto(self, lines):
         '''
-        This function will only parse static mesh
+        Lets try parsing different modes and check the outcome, then we will decide on
+        the result to keep
         :param lines:
         :return:
         '''
-        mesh_lines = []
-        scopecounter = 0
-        start_adding = False
+        meshWorks = False
+        try:
+            meshLines           = self._get_mesh_lines(lines)
+            matFilename         = self._getmaterialname(lines)
+            meshDict            = self._get_mesh_data(meshLines)
+            meshName            = self._get_mesh_name(meshLines)
 
-        #Get only the mesh lines from the file
-        for line in lines:
-            newline = line.strip()
+            meshWorks = True
+        except:
+            pass
 
-            if newline.startswith(';'):
-                continue
+        skinnedWorks = False
+        try:
 
-            if  "Model" in newline and " \"Mesh\"" in newline and '{' in newline:
+            stringPoseNodes     = self._get_bindpose_lines(lines)
+            poseNodesDict       = self._create_posenodes(stringPoseNodes)
 
-                start_adding = True
-                mesh_lines.append(newline)
-                scopecounter += 1
-                continue
+            stringDeforNodes    = self._get_deformernodes(lines)
+            deformerNodes       = self._parse_deformers(stringDeforNodes)
 
-            if start_adding and scopecounter > 0:
-                mesh_lines.append(newline)
-                if '{' in newline:
-                    scopecounter += 1
+            connectionsDict     = self._get_connections(lines)
+            if any(deformerNodes) and any(poseNodesDict) and any(connectionsDict):
+                skinnedWorks = True
+            else:
+                skinnedWorks = False
+        except:
+            pass
 
-                if '}' in newline:
-                    scopecounter -= 1
-
-        texture_lines = self._getmaterialname(lines)
-        texture_data = self.gettextureinfo(texture_lines)
-
-        mesh_pack    = self.createmodelmeshlinespacked(mesh_lines)
-        staticmodel = self.create_mesh_data_static(mesh_pack)
-        mesh_string = self.write_meshdata_lines(staticmodel, texture_data)
-
-        header = ('meshname: {}\n'.format(staticmodel.meshname),'material: {}\n'.format(texture_data.reltexturename.split('\\')[-1]))
-
+        animWorks = False
+        try:
+            result = self._parse_take(lines)
+            if not any(result):
+                animWorks = False
+            else:
+                animWorks = True
+        except:
+            pass
+        print("static: ", meshWorks)
+        print("animated: ", animWorks)
+        print("skinned: ", skinnedWorks)
+        pass
 
     def convert(self, arguments):
         '''
@@ -1245,13 +1157,14 @@ class FbxParser:
         '''
         #lines = self._open_file(arguments.path_in, arguments.filename_in)
 
-        lines_meshs = self._open_file('.', 'deformer_low.fbx')
-        lines_anim = self._open_file('.', 'anim.fbx')
-        result     = self._parse_take(lines_anim)
+        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'static_low.fbx')
+        self._convert_auto(lines)
+        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'animation_1000.fbx')
+        self._convert_auto(lines)
+        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'figure.fbx')
+        self._convert_auto(lines)
 
-        res = self.convert_skinned(lines_meshs)
         pass
-
 
     def _open_file(self, path, filename) -> list():
         '''
