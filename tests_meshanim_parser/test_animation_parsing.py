@@ -1,84 +1,123 @@
 import unittest
-from fbx_parser import FbxParser
+import argparse
 
-class Test_Animation_Convert(unittest.TestCase):
+from fbx_parser.fbx_parser_rework import FbxParser
 
-    def test_convert_animation_06(self):
+class fbx_parser_tests(unittest.TestCase):
+
+    def test_convert_animation(self):
         '''
         Clear the Test Output files
         :return:
         '''
         try:
-            with open('input/skeleton_pointing.fbx') as f:
-                lines = f.readlines()
-            parser = FbxParser()
-            parser.convert_animation('output/skeleton_pointing', lines)
+
+            fbxparser = FbxParser()
+
+            parser = argparse.ArgumentParser()
+
+            parser.add_argument('--inpath', action='store', dest='path_in',
+                                default=".", help='Select the path of the file to parse')
+
+            parser.add_argument('--infile', action='store', dest='filename_in',
+                                default="None.fbx", help='Select the file to parse')
+
+            parser.add_argument('--outpath', action='store', dest='path_out',
+                                default=".", help='Choose the output folder')
+
+            parser.add_argument('--outfile', action='store', dest='filename_out',
+                                default=".", help='Enter the target filename')
+
+            parser.add_argument('--mode', action='store', dest='mode',
+                                default="model", help='Pick between map or model')
+
+            results = parser.parse_args()
+
+            results.path_in = 'input_files//fbxfiles'
+            results.filename_in = 'test_animation.fbx'
+            results.path_out = 'output_files//animation'
+            results.filename_out = 'animation'
+
+            fbxparser._convert_auto(results)
+
+            self.assertTrue(True)
         except:
             self.assertTrue(False)
 
-    def test_convert_animation_05(self):
+    def test_convert_static(self):
         '''
         Clear the Test Output files
         :return:
         '''
         try:
-            with open('input/skeleton_anim_new.fbx') as f:
-                lines = f.readlines()
+            fbxparser = FbxParser()
 
-            parser = FbxParser()
-            parser.convert_animation('output/skeleton_anim_new', lines)
+            parser = argparse.ArgumentParser()
+
+            parser.add_argument('--inpath', action='store', dest='path_in',
+                                default=".", help='Select the path of the file to parse')
+
+            parser.add_argument('--infile', action='store', dest='filename_in',
+                                default="None.fbx", help='Select the file to parse')
+
+            parser.add_argument('--outpath', action='store', dest='path_out',
+                                default=".", help='Choose the output folder')
+
+            parser.add_argument('--outfile', action='store', dest='filename_out',
+                                default=".", help='Enter the target filename')
+
+            parser.add_argument('--mode', action='store', dest='mode',
+                                default="model", help='Pick between map or model')
+
+            results = parser.parse_args()
+
+            results.path_in = 'input_files//fbxfiles'
+            results.filename_in = 'test_sphere.fbx'
+            results.path_out = 'output_files//models'
+            results.filename_out = 'sphere'
+
+            fbxparser._convert_auto(results)
+
+            self.assertTrue(True)
         except:
             self.assertTrue(False)
 
-    def test_convert_animation_04(self):
+    def test_convert_skinned(self):
         '''
         Clear the Test Output files
         :return:
         '''
         try:
-            with open('input/gun_anim.fbx') as f:
-                lines = f.readlines()
-            parser = FbxParser()
-            parser.convert_animation('output/gun_anim', lines)
-        except:
-            self.assertTrue(False)
 
-    def test_convert_animation_03(self):
-        '''
-        Clear the Test Output files
-        :return:
-        '''
-        try:
-            with open('input/character_running.fbx') as f:
-                lines = f.readlines()
-            parser = FbxParser()
-            parser.convert_animation('output/character_running', lines)
-        except:
-            self.assertTrue(False)
+            fbxparser = FbxParser()
 
-    def test_convert_animation_02(self):
-        '''
-        Clear the Test Output files
-        :return:
-        '''
-        try:
-            with open('input/character_breathing.fbx') as f:
-                lines = f.readlines()
-            parser = FbxParser()
-            parser.convert_animation('output/character_breathing', lines)
-        except:
-            self.assertTrue(False)
+            parser = argparse.ArgumentParser()
 
-    def test_convert_animation_01(self):
-        '''
-        Very shallow test to see if the convert animation passes
-        :return:
-        '''
-        try:
-            with open('input/animation_1000.fbx') as f:
-                lines = f.readlines()
-            parser = FbxParser()
-            parser.convert_animation('output/animation_1000', lines)
+            parser.add_argument('--inpath', action='store', dest='path_in',
+                                default=".", help='Select the path of the file to parse')
+
+            parser.add_argument('--infile', action='store', dest='filename_in',
+                                default="None.fbx", help='Select the file to parse')
+
+            parser.add_argument('--outpath', action='store', dest='path_out',
+                                default=".", help='Choose the output folder')
+
+            parser.add_argument('--outfile', action='store', dest='filename_out',
+                                default=".", help='Enter the target filename')
+
+            parser.add_argument('--mode', action='store', dest='mode',
+                                default="model", help='Pick between map or model')
+
+            results = parser.parse_args()
+
+            results.path_in = 'input_files//fbxfiles'
+            results.filename_in = 'test_skinned.fbx'
+            results.path_out = 'output_files//models'
+            results.filename_out = 'skinned'
+
+            fbxparser._convert_auto(results)
+
+            self.assertTrue(True)
         except:
             self.assertTrue(False)
 

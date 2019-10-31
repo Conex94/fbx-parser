@@ -528,7 +528,6 @@ class FbxParser:
         '''
 
         if meshlines.__len__() < 1:
-            print('No Mesh data')
             raise Exception('No Mesh data in meshlines')
 
         name = meshlines[0][8:]
@@ -959,7 +958,6 @@ class FbxParser:
         deformers = list()
 
         for def_single in defs:
-            #print(def_single['lines'])
             deformer = {'transform': [], 'name': '', 'weights' : [], 'indexes' : [], 'transformlink' : []}
 
             indices_line = ""
@@ -1021,13 +1019,11 @@ class FbxParser:
 
             for l in w:
                 deformer['weights'].append(float(l))
-
             if w.__len__() < 1:
                 deformer['weights'].append(0.0)
 
             for l in i:
                 deformer['indexes'].append(int(l))
-
             if i.__len__() < 1:
                 deformer['indexes'].append(0)
 
@@ -1040,7 +1036,6 @@ class FbxParser:
                 deformer['transformlink'].append(float(t))
 
             deformers.append(deformer)
-
 
         return deformers
 
@@ -1078,34 +1073,62 @@ class FbxParser:
 
         return mesh_lines
 
-    def convert_skinned(self, lines):
-        '''
-        :param name:
-        :param lines:
-        :return:
-        '''
+    def _unroll_mesh(self, defornodes, mesh):
 
-        meshLines           = self._get_mesh_lines(lines)
-        matFilename         = self._getmaterialname(lines)
-        meshDict            = self._get_mesh_data(meshLines)
-        meshName            = self._get_mesh_name(meshLines)
-
-        stringPoseNodes     = self._get_bindpose_lines(lines)
-        poseNodesDict       = self._create_posenodes(stringPoseNodes)
-
-        stringDeforNodes    = self._get_deformernodes(lines)
-        deformerNodes       = self._parse_deformers(stringDeforNodes)
-
-        connectionsDict     = self._get_connections(lines)
+        uvsUnrolled         = []
+        pointsUnrolled      = []
 
 
-    def _convert_auto(self, lines):
+        mesh['points_3d'] = [] #list of tuple for x,y,z
+        mesh['uv_2d'] = [] #list of tuple for x,y
+
+        counter = 0
+        while counter < len(mesh['points']):
+            point = (mesh['points'][counter],mesh['points'][counter+1],mesh['points'][counter+2])
+            mesh['points_3d'].append(point)
+
+            counter+=3
+
+        counter = 0
+        while counter < len(mesh['uv']):
+            point = (mesh['uv'][counter],mesh['uv'][counter+1])
+            mesh['uv_2d'].append(point)
+            counter+=2
+
+        for i in range(0, len(mesh['pointsi'])):
+            Entry = mesh['points_3d'][mesh['pointsi'][i]]
+            pointsUnrolled.append(Entry)
+
+        for i in range(0, len(mesh['uvi'])):
+            Entry = mesh['uv_2d'][mesh['uvi'][i]]
+            uvsUnrolled.append(Entry)
+
+        weightsUnrolled=  [ [] for a in mesh['points_3d']]
+        indexesUnrolled=  [ [] for a in mesh['points_3d']]
+
+        for x in defornodes:
+            for y in range(0, len(x['weights'])):
+                current_weight = x['weights'][y]
+                current_index = x['indexes'][y]
+                if current_weight > 0.05 and \
+                len(indexesUnrolled[current_index]) < 4 and \
+                len(weightsUnrolled[current_index]) < 4:
+                    weightsUnrolled[current_index].append(current_weight)
+                    indexesUnrolled[current_index].append(current_index)
+
+        mesh['index_unrolled'] = indexesUnrolled
+        mesh['weight_unrolled'] = weightsUnrolled
+
+    def _convert_auto(self, arguments):
         '''
         Lets try parsing different modes and check the outcome, then we will decide on
         the result to keep
         :param lines:
         :return:
         '''
+        start = time.time()
+        lines = self._open_file(arguments.path_in, arguments.filename_in)
+
         meshWorks = False
         try:
             meshLines           = self._get_mesh_lines(lines)
@@ -1125,6 +1148,7 @@ class FbxParser:
 
             stringDeforNodes    = self._get_deformernodes(lines)
             deformerNodes       = self._parse_deformers(stringDeforNodes)
+            packed_mesh         = self._unroll_mesh(deformerNodes, meshDict)
 
             connectionsDict     = self._get_connections(lines)
             if any(deformerNodes) and any(poseNodesDict) and any(connectionsDict):
@@ -1135,36 +1159,47 @@ class FbxParser:
             pass
 
         animWorks = False
+
         try:
-            result = self._parse_take(lines)
-            if not any(result):
+            animation_take = self._parse_take(lines)
+            if not any(animation_take):
                 animWorks = False
             else:
                 animWorks = True
         except:
             pass
-        print("static: ", meshWorks)
-        print("animated: ", animWorks)
-        print("skinned: ", skinnedWorks)
-        pass
 
-    def convert(self, arguments):
-        '''
-        Main function for converting files, all logic and calls happen here
 
-        :param arguments :Dictionairy of the argparse arguments
-        :return:
-        '''
-        #lines = self._open_file(arguments.path_in, arguments.filename_in)
+        if animWorks:
+            out_dict = {'name': None,'animation': None,}
+            out_dict['animation'] = animation_take
 
-        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'static_low.fbx')
-        self._convert_auto(lines)
-        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'animation_1000.fbx')
-        self._convert_auto(lines)
-        lines = self._open_file('..\\tests_meshanim_parser\\input_files\\fbxfiles', 'figure.fbx')
-        self._convert_auto(lines)
+            import json
+            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
 
-        pass
+        if meshWorks:
+            out_dict = { 'name': None, 'materialfile': None,'mesh': None}
+            out_dict['mesh'] = meshDict
+            out_dict['name'] = meshName
+            out_dict['materialfile'] = matFilename
+
+            import json
+            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+
+        if skinnedWorks:
+            out_dict = {'name' : None, 'mesh': None, 'materialfile': None, 'deformers': None, 'posenodes': None, 'connections': None}
+            out_dict['mesh'] = meshDict
+            out_dict['name'] = meshName
+            out_dict['deformers'] = deformerNodes
+            out_dict['posenodes'] = poseNodesDict
+            out_dict['connections'] = connectionsDict
+            out_dict['materialfile'] = matFilename
+            import json
+            self._write_file( json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+
+        print(meshDict)
+        end = time.time()
+        print("Done Converting file: Time Taken: {}".format(end - start))
 
     def _open_file(self, path, filename) -> list():
         '''
@@ -1181,13 +1216,33 @@ class FbxParser:
             filename = "{}{}".format(filename, '.fbx')
 
         pathname = os.path.join(path,filename)
-        print("Opening file: {}.".format(pathname))
+
         with open(pathname, 'r') as fin:
             file_lines = fin.readlines()
 
         end = time.time()
-        print("Done Opening file: {}. Time Taken: {}".format(pathname, end-start))
+
         return file_lines
+
+    def _write_file(self, data, path, filename) -> list():
+        '''
+        Write a File
+        :param path: file path
+        :param filename: file name
+        :return:
+        '''
+
+        start = time.time()
+
+        #add the .fbx if it isnt in the name
+        if not '.fbx' in filename:
+            filename = "{}".format(filename)
+
+        pathname = os.path.join(path,filename)
+
+        with open(pathname, 'w') as fout:
+            fout.write(data)
+        end = time.time()
 
 if __name__ == '__main__':
 
@@ -1208,11 +1263,7 @@ if __name__ == '__main__':
     parser.add_argument('--mode', action='store', dest='mode',
                         default="model", help='Pick between map or model')
 
-
-
     fbxparser = FbxParser()
     results = parser.parse_args()
-
-    fbxparser.convert(results)
     fbxparser.convert(results)
 
