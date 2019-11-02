@@ -1116,7 +1116,9 @@ class FbxParser:
                     weightsUnrolled[current_index].append(current_weight)
                     indexesUnrolled[current_index].append(current_index)
 
-        mesh['index_unrolled'] = indexesUnrolled
+        mesh['points_unrolled'] = pointsUnrolled
+        mesh['uv_unrolled']     = uvsUnrolled
+        mesh['index_unrolled']  = indexesUnrolled
         mesh['weight_unrolled'] = weightsUnrolled
 
     def _convert_auto(self, arguments):
@@ -1148,7 +1150,8 @@ class FbxParser:
 
             stringDeforNodes    = self._get_deformernodes(lines)
             deformerNodes       = self._parse_deformers(stringDeforNodes)
-            packed_mesh         = self._unroll_mesh(deformerNodes, meshDict)
+
+            self._unroll_mesh(deformerNodes, meshDict)
 
             connectionsDict     = self._get_connections(lines)
             if any(deformerNodes) and any(poseNodesDict) and any(connectionsDict):
@@ -1168,7 +1171,6 @@ class FbxParser:
                 animWorks = True
         except:
             pass
-
 
         if animWorks:
             out_dict = {'name': None,'animation': None,}
@@ -1195,7 +1197,7 @@ class FbxParser:
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
             import json
-            self._write_file( json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
 
         print(meshDict)
         end = time.time()
