@@ -885,7 +885,8 @@ class FbxParser:
                 theline = line.strip()[19:]
                 materialline = theline[0: theline.__len__() - 1]
                 break
-        return materialline
+
+        return materialline.split('\\')[-1].split('.')[0]
 
     def _get_deformernodes(self, lines):
         '''
@@ -1081,12 +1082,18 @@ class FbxParser:
 
         mesh['points_3d'] = [] #list of tuple for x,y,z
         mesh['uv_2d'] = [] #list of tuple for x,y
+        mesh['normals_unrolled'] = [] #list of tuple for x,y
 
         counter = 0
         while counter < len(mesh['points']):
             point = (mesh['points'][counter],mesh['points'][counter+1],mesh['points'][counter+2])
             mesh['points_3d'].append(point)
+            counter+=3
 
+        counter = 0
+        while counter < len(mesh['normals']):
+            point = (mesh['normals'][counter],mesh['normals'][counter+1],mesh['normals'][counter+2])
+            mesh['normals_unrolled'].append(point)
             counter+=3
 
         counter = 0
@@ -1106,32 +1113,43 @@ class FbxParser:
         weightsUnrolled=  [ [] for a in mesh['points_3d']]
         indexesUnrolled=  [ [] for a in mesh['points_3d']]
 
-        for x in defornodes:
-            for y in range(0, len(x['weights'])):
-                current_weight = x['weights'][y]
-                current_index = x['indexes'][y]
-                if current_weight > 0.05 and \
-                len(indexesUnrolled[current_index]) < 4 and \
-                len(weightsUnrolled[current_index]) < 4:
-                    weightsUnrolled[current_index].append(current_weight)
-                    indexesUnrolled[current_index].append(current_index)
+        if defornodes:
+            for x in defornodes:
+                for y in range(0, len(x['weights'])):
+                    current_weight = x['weights'][y]
+                    current_index = x['indexes'][y]
+                    if current_weight > 0.05 and \
+                    len(indexesUnrolled[current_index]) < 4 and \
+                    len(weightsUnrolled[current_index]) < 4:
+                        weightsUnrolled[current_index].append(current_weight)
+                        indexesUnrolled[current_index].append(current_index)
 
+            mesh['index_unrolled'] = indexesUnrolled
+            mesh['weight_unrolled'] = weightsUnrolled
+
+        mesh['uv_unrolled'] = uvsUnrolled
         mesh['points_unrolled'] = pointsUnrolled
-        mesh['uv_unrolled']     = uvsUnrolled
-        mesh['index_unrolled']  = indexesUnrolled
-        mesh['weight_unrolled'] = weightsUnrolled
+
+        del mesh['points']
+        del mesh['normals']
+        del mesh['uv']
+
+        pass
+
 
     def _convert_auto(self, arguments):
         '''
         Lets try parsing different modes and check the outcome, then we will decide on
-        the result to keep
+        the result to keeip
         :param lines:
         :return:
         '''
         start = time.time()
         lines = self._open_file(arguments.path_in, arguments.filename_in)
 
+        meshDict = {}
         meshWorks = False
+        deformerNodes = None
         try:
             meshLines           = self._get_mesh_lines(lines)
             matFilename         = self._getmaterialname(lines)
@@ -1144,16 +1162,14 @@ class FbxParser:
 
         skinnedWorks = False
         try:
-
             stringPoseNodes     = self._get_bindpose_lines(lines)
             poseNodesDict       = self._create_posenodes(stringPoseNodes)
 
             stringDeforNodes    = self._get_deformernodes(lines)
             deformerNodes       = self._parse_deformers(stringDeforNodes)
 
-            self._unroll_mesh(deformerNodes, meshDict)
-
             connectionsDict     = self._get_connections(lines)
+
             if any(deformerNodes) and any(poseNodesDict) and any(connectionsDict):
                 skinnedWorks = True
             else:
@@ -1177,16 +1193,18 @@ class FbxParser:
             out_dict['animation'] = animation_take
 
             import json
-            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
-
-        if meshWorks:
+            #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
+        self._unroll_mesh(deformerNodes, meshDict)
+        if not skinnedWorks and meshWorks:
             out_dict = { 'name': None, 'materialfile': None,'mesh': None}
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
             out_dict['materialfile'] = matFilename
 
             import json
-            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
+            #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
 
         if skinnedWorks:
             out_dict = {'name' : None, 'mesh': None, 'materialfile': None, 'deformers': None, 'posenodes': None, 'connections': None}
@@ -1197,11 +1215,86 @@ class FbxParser:
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
             import json
-            self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
+            #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
 
-        print(meshDict)
         end = time.time()
         print("Done Converting file: Time Taken: {}".format(end - start))
+
+    def _write_output(self, outDict, path_out, filename_out):
+        print(filename_out)
+        final_string = ""
+        for k in outDict:
+            if 'animation' in k:
+                final_string += 'name: ' + filename_out
+                final_string += '<ANIMATION>\n'
+                for deformer in outDict['animation']:
+
+                    final_string += '<DEFORMER>\n'
+                    final_string += 'deformername: {}{}'.format(deformer['deformername'], '\n')
+
+                    channel_t_x_kd = deformer['channel_translate']['channel_x']['keydistances']
+                    channel_t_x_kv = deformer['channel_translate']['channel_x']['keyvalues']
+
+                    channel_t_y_kd = deformer['channel_translate']['channel_y']['keydistances']
+                    channel_t_y_kv = deformer['channel_translate']['channel_y']['keyvalues']
+
+                    channel_t_z_kd = deformer['channel_translate']['channel_z']['keydistances']
+                    channel_t_z_kv = deformer['channel_translate']['channel_z']['keyvalues']
+
+                    channel_r_x_kd = deformer['channel_rotate']['channel_x']['keydistances']
+                    channel_r_x_kv = deformer['channel_rotate']['channel_x']['keyvalues']
+
+                    channel_r_y_kd = deformer['channel_rotate']['channel_y']['keydistances']
+                    channel_r_y_kv = deformer['channel_rotate']['channel_y']['keyvalues']
+
+                    channel_r_z_kd = deformer['channel_rotate']['channel_z']['keydistances']
+                    channel_r_z_kv = deformer['channel_rotate']['channel_z']['keyvalues']
+
+                    channel_s_x_kd = deformer['channel_scale']['channel_x']['keydistances']
+                    channel_s_x_kv = deformer['channel_scale']['channel_x']['keyvalues']
+
+                    channel_s_y_kd = deformer['channel_scale']['channel_y']['keydistances']
+                    channel_s_y_kv = deformer['channel_scale']['channel_y']['keyvalues']
+
+                    channel_s_z_kd = deformer['channel_scale']['channel_z']['keydistances']
+                    channel_s_z_kv = deformer['channel_scale']['channel_z']['keyvalues']
+
+                    final_string += '<CHANNEL_T_X_KD>\n' + '\n'.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
+                    final_string += '<CHANNEL_T_X_KV>\n' + '\n'.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
+
+                    final_string += '<CHANNEL_T_Y_KD>\n' + '\n'.join(map(str, channel_t_y_kd)) + '\n' + '</CHANNEL_T_Y_KD>\n'
+                    final_string += '<CHANNEL_T_Y_KV>\n' + '\n'.join(map(str, channel_t_y_kv)) + '\n' + '</CHANNEL_T_Y_KV>\n'
+
+                    final_string += '<CHANNEL_T_Z_KD>\n' + '\n'.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
+                    final_string += '<CHANNEL_T_Z_KV>\n' + '\n'.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
+
+                    final_string += '<CHANNEL_R_X_KD>\n' + '\n'.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
+                    final_string += '<CHANNEL_R_X_KV>\n' + '\n'.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
+
+                    final_string += '<CHANNEL_R_Y_KD>\n' + '\n'.join(map(str, channel_r_y_kd)) + '\n' + '</CHANNEL_R_Y_KD>\n'
+                    final_string += '<CHANNEL_R_Y_KV>\n' + '\n'.join(map(str, channel_r_y_kv)) + '\n' + '</CHANNEL_R_Y_KV>\n'
+
+                    final_string += '<CHANNEL_R_Z_KD>\n' + '\n'.join(map(str, channel_r_z_kd)) + '\n' + '</CHANNEL_R_Z_KD>\n'
+                    final_string += '<CHANNEL_R_Z_KV>\n' + '\n'.join(map(str, channel_r_z_kv)) + '\n' + '</CHANNEL_R_Z_KV>\n'
+
+
+                    final_string += '<CHANNEL_S_X_KD>\n' + '\n'.join(map(str, channel_s_x_kd)) + '\n' + '</CHANNEL_S_X_KD>\n'
+                    final_string += '<CHANNEL_S_X_KV>\n' + '\n'.join(map(str, channel_s_x_kv)) + '\n' + '</CHANNEL_S_X_KV>\n'
+
+                    final_string += '<CHANNEL_S_Y_KD>\n' + '\n'.join(map(str, channel_s_y_kd)) + '\n' + '</CHANNEL_S_Y_KD>\n'
+                    final_string += '<CHANNEL_S_Y_KV>\n' + '\n'.join(map(str, channel_s_y_kv)) + '\n' + '</CHANNEL_S_Y_KV>\n'
+
+                    final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
+                    final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
+
+
+                    final_string += '</DEFORMER>\n'
+                    pass
+                final_string += '</ANIMATION>\n'
+
+        print(final_string)
+        pass
 
     def _open_file(self, path, filename) -> list():
         '''

@@ -12,8 +12,6 @@ class fbx_parser_tests(unittest.TestCase):
         '''
 
         try:
-            self.assertTrue(True)
-            return
             fbxparser = FbxParser()
 
             parser = argparse.ArgumentParser()
@@ -90,8 +88,7 @@ class fbx_parser_tests(unittest.TestCase):
         :return:
         '''
         try:
-            self.assertTrue(True)
-            return
+
             fbxparser = FbxParser()
 
             parser = argparse.ArgumentParser()

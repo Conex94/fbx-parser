@@ -17006,7 +17006,7 @@
             ]
         ]
     },
-    "materialfile": "cube",
+    "materialfile": "..\\materials\\cube.tga",
     "deformers": [
         {
             "transform": [
