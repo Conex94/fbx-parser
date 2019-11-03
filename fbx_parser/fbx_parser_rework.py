@@ -1192,9 +1192,9 @@ class FbxParser:
             out_dict = {'name': None,'animation': None,}
             out_dict['animation'] = animation_take
 
-            import json
+
             #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
         self._unroll_mesh(deformerNodes, meshDict)
         if not skinnedWorks and meshWorks:
             out_dict = { 'name': None, 'materialfile': None,'mesh': None}
@@ -1202,9 +1202,7 @@ class FbxParser:
             out_dict['name'] = meshName
             out_dict['materialfile'] = matFilename
 
-            import json
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
-            #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 
         if skinnedWorks:
             out_dict = {'name' : None, 'mesh': None, 'materialfile': None, 'deformers': None, 'posenodes': None, 'connections': None}
@@ -1214,87 +1212,91 @@ class FbxParser:
             out_dict['posenodes'] = poseNodesDict
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
-            import json
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out + '.mesh')
-            #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.mesh')
+
+            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 
         end = time.time()
         print("Done Converting file: Time Taken: {}".format(end - start))
 
     def _write_output(self, outDict, path_out, filename_out):
-        print(filename_out)
-        final_string = ""
-        for k in outDict:
-            if 'animation' in k:
-                final_string += 'name: ' + filename_out
-                final_string += '<ANIMATION>\n'
-                for deformer in outDict['animation']:
 
-                    final_string += '<DEFORMER>\n'
-                    final_string += 'deformername: {}{}'.format(deformer['deformername'], '\n')
+        if 'animation' in outDict:
+            final_string = ""
+            final_string += 'name: ' + filename_out + '\n'
+            for deformer in outDict['animation']:
+                final_string += '<DEFORMER>\n'
+                final_string += 'deformername: {}{}'.format(deformer['deformername'], '\n')
 
-                    channel_t_x_kd = deformer['channel_translate']['channel_x']['keydistances']
-                    channel_t_x_kv = deformer['channel_translate']['channel_x']['keyvalues']
+                channel_t_x_kd = deformer['channel_translate']['channel_x']['keydistances']
+                channel_t_x_kv = deformer['channel_translate']['channel_x']['keyvalues']
 
-                    channel_t_y_kd = deformer['channel_translate']['channel_y']['keydistances']
-                    channel_t_y_kv = deformer['channel_translate']['channel_y']['keyvalues']
+                channel_t_y_kd = deformer['channel_translate']['channel_y']['keydistances']
+                channel_t_y_kv = deformer['channel_translate']['channel_y']['keyvalues']
 
-                    channel_t_z_kd = deformer['channel_translate']['channel_z']['keydistances']
-                    channel_t_z_kv = deformer['channel_translate']['channel_z']['keyvalues']
+                channel_t_z_kd = deformer['channel_translate']['channel_z']['keydistances']
+                channel_t_z_kv = deformer['channel_translate']['channel_z']['keyvalues']
 
-                    channel_r_x_kd = deformer['channel_rotate']['channel_x']['keydistances']
-                    channel_r_x_kv = deformer['channel_rotate']['channel_x']['keyvalues']
+                channel_r_x_kd = deformer['channel_rotate']['channel_x']['keydistances']
+                channel_r_x_kv = deformer['channel_rotate']['channel_x']['keyvalues']
 
-                    channel_r_y_kd = deformer['channel_rotate']['channel_y']['keydistances']
-                    channel_r_y_kv = deformer['channel_rotate']['channel_y']['keyvalues']
+                channel_r_y_kd = deformer['channel_rotate']['channel_y']['keydistances']
+                channel_r_y_kv = deformer['channel_rotate']['channel_y']['keyvalues']
 
-                    channel_r_z_kd = deformer['channel_rotate']['channel_z']['keydistances']
-                    channel_r_z_kv = deformer['channel_rotate']['channel_z']['keyvalues']
+                channel_r_z_kd = deformer['channel_rotate']['channel_z']['keydistances']
+                channel_r_z_kv = deformer['channel_rotate']['channel_z']['keyvalues']
 
-                    channel_s_x_kd = deformer['channel_scale']['channel_x']['keydistances']
-                    channel_s_x_kv = deformer['channel_scale']['channel_x']['keyvalues']
+                channel_s_x_kd = deformer['channel_scale']['channel_x']['keydistances']
+                channel_s_x_kv = deformer['channel_scale']['channel_x']['keyvalues']
 
-                    channel_s_y_kd = deformer['channel_scale']['channel_y']['keydistances']
-                    channel_s_y_kv = deformer['channel_scale']['channel_y']['keyvalues']
+                channel_s_y_kd = deformer['channel_scale']['channel_y']['keydistances']
+                channel_s_y_kv = deformer['channel_scale']['channel_y']['keyvalues']
 
-                    channel_s_z_kd = deformer['channel_scale']['channel_z']['keydistances']
-                    channel_s_z_kv = deformer['channel_scale']['channel_z']['keyvalues']
+                channel_s_z_kd = deformer['channel_scale']['channel_z']['keydistances']
+                channel_s_z_kv = deformer['channel_scale']['channel_z']['keyvalues']
 
-                    final_string += '<CHANNEL_T_X_KD>\n' + '\n'.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
-                    final_string += '<CHANNEL_T_X_KV>\n' + '\n'.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
+                final_string += '<CHANNEL_T_X_KD>\n' + '\n'.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
+                final_string += '<CHANNEL_T_X_KV>\n' + '\n'.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
 
-                    final_string += '<CHANNEL_T_Y_KD>\n' + '\n'.join(map(str, channel_t_y_kd)) + '\n' + '</CHANNEL_T_Y_KD>\n'
-                    final_string += '<CHANNEL_T_Y_KV>\n' + '\n'.join(map(str, channel_t_y_kv)) + '\n' + '</CHANNEL_T_Y_KV>\n'
+                final_string += '<CHANNEL_T_Y_KD>\n' + '\n'.join(map(str, channel_t_y_kd)) + '\n' + '</CHANNEL_T_Y_KD>\n'
+                final_string += '<CHANNEL_T_Y_KV>\n' + '\n'.join(map(str, channel_t_y_kv)) + '\n' + '</CHANNEL_T_Y_KV>\n'
 
-                    final_string += '<CHANNEL_T_Z_KD>\n' + '\n'.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
-                    final_string += '<CHANNEL_T_Z_KV>\n' + '\n'.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
+                final_string += '<CHANNEL_T_Z_KD>\n' + '\n'.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
+                final_string += '<CHANNEL_T_Z_KV>\n' + '\n'.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
 
-                    final_string += '<CHANNEL_R_X_KD>\n' + '\n'.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
-                    final_string += '<CHANNEL_R_X_KV>\n' + '\n'.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
+                final_string += '<CHANNEL_R_X_KD>\n' + '\n'.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
+                final_string += '<CHANNEL_R_X_KV>\n' + '\n'.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
 
-                    final_string += '<CHANNEL_R_Y_KD>\n' + '\n'.join(map(str, channel_r_y_kd)) + '\n' + '</CHANNEL_R_Y_KD>\n'
-                    final_string += '<CHANNEL_R_Y_KV>\n' + '\n'.join(map(str, channel_r_y_kv)) + '\n' + '</CHANNEL_R_Y_KV>\n'
+                final_string += '<CHANNEL_R_Y_KD>\n' + '\n'.join(map(str, channel_r_y_kd)) + '\n' + '</CHANNEL_R_Y_KD>\n'
+                final_string += '<CHANNEL_R_Y_KV>\n' + '\n'.join(map(str, channel_r_y_kv)) + '\n' + '</CHANNEL_R_Y_KV>\n'
 
-                    final_string += '<CHANNEL_R_Z_KD>\n' + '\n'.join(map(str, channel_r_z_kd)) + '\n' + '</CHANNEL_R_Z_KD>\n'
-                    final_string += '<CHANNEL_R_Z_KV>\n' + '\n'.join(map(str, channel_r_z_kv)) + '\n' + '</CHANNEL_R_Z_KV>\n'
+                final_string += '<CHANNEL_R_Z_KD>\n' + '\n'.join(map(str, channel_r_z_kd)) + '\n' + '</CHANNEL_R_Z_KD>\n'
+                final_string += '<CHANNEL_R_Z_KV>\n' + '\n'.join(map(str, channel_r_z_kv)) + '\n' + '</CHANNEL_R_Z_KV>\n'
 
 
-                    final_string += '<CHANNEL_S_X_KD>\n' + '\n'.join(map(str, channel_s_x_kd)) + '\n' + '</CHANNEL_S_X_KD>\n'
-                    final_string += '<CHANNEL_S_X_KV>\n' + '\n'.join(map(str, channel_s_x_kv)) + '\n' + '</CHANNEL_S_X_KV>\n'
+                final_string += '<CHANNEL_S_X_KD>\n' + '\n'.join(map(str, channel_s_x_kd)) + '\n' + '</CHANNEL_S_X_KD>\n'
+                final_string += '<CHANNEL_S_X_KV>\n' + '\n'.join(map(str, channel_s_x_kv)) + '\n' + '</CHANNEL_S_X_KV>\n'
 
-                    final_string += '<CHANNEL_S_Y_KD>\n' + '\n'.join(map(str, channel_s_y_kd)) + '\n' + '</CHANNEL_S_Y_KD>\n'
-                    final_string += '<CHANNEL_S_Y_KV>\n' + '\n'.join(map(str, channel_s_y_kv)) + '\n' + '</CHANNEL_S_Y_KV>\n'
+                final_string += '<CHANNEL_S_Y_KD>\n' + '\n'.join(map(str, channel_s_y_kd)) + '\n' + '</CHANNEL_S_Y_KD>\n'
+                final_string += '<CHANNEL_S_Y_KV>\n' + '\n'.join(map(str, channel_s_y_kv)) + '\n' + '</CHANNEL_S_Y_KV>\n'
 
-                    final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
-                    final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
+                final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
+                final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
 
+                final_string += '</DEFORMER>\n'
+                pass
 
-                    final_string += '</DEFORMER>\n'
-                    pass
-                final_string += '</ANIMATION>\n'
+            full_name = os.path.join(path_out,filename_out)
+            with open(full_name + '.anim', 'w') as fout:
+                fout.write(final_string)
 
-        print(final_string)
-        pass
+        if 'name' in outDict and 'mesh' in outDict and 'materialfile' in outDict:
+            final_string += 'name: ' + outDict['name'] + '\n'
+            final_string += 'material: ' + outDict['materialfile'] + '\n'
+
+            full_name = os.path.join(path_out, filename_out)
+            with open(full_name + '.mesh', 'w') as fout:
+                fout.write(final_string)
+
 
     def _open_file(self, path, filename) -> list():
         '''
