@@ -1085,21 +1085,21 @@ class FbxParser:
 
         counter = 0
         while counter < len(mesh['points']):
-            point = (mesh['points'][counter],mesh['points'][counter+1],mesh['points'][counter+2])
+            point = (mesh['points'][counter], mesh['points'][counter+1], mesh['points'][counter+2])
             mesh['points_3d'].append(point)
-            counter+=3
+            counter += 3
 
         counter = 0
         while counter < len(mesh['normals']):
-            point = (mesh['normals'][counter],mesh['normals'][counter+1],mesh['normals'][counter+2])
+            point = (mesh['normals'][counter], mesh['normals'][counter+1], mesh['normals'][counter+2])
             mesh['normals_unrolled'].append(point)
-            counter+=3
+            counter += 3
 
         counter = 0
         while counter < len(mesh['uv']):
             point = (mesh['uv'][counter],mesh['uv'][counter+1])
             mesh['uv_2d'].append(point)
-            counter+=2
+            counter += 2
 
         for i in range(0, len(mesh['pointsi'])):
             Entry = mesh['points_3d'][mesh['pointsi'][i]]
@@ -1109,10 +1109,10 @@ class FbxParser:
             Entry = mesh['uv_2d'][mesh['uvi'][i]]
             uvsUnrolled.append(Entry)
 
-        weightsUnrolled=  [ [] for a in mesh['points_3d']]
-        indexesUnrolled=  [ [] for a in mesh['points_3d']]
+        weightsUnrolled = [ [] for a in mesh['points_3d']]
+        indexesUnrolled = [ [] for a in mesh['points_3d']]
 
-        if defornodes:
+        if any(defornodes):
             for x in defornodes:
                 for y in range(0, len(x['weights'])):
                     current_weight = x['weights'][y]
@@ -1200,12 +1200,12 @@ class FbxParser:
 
         #do it for both
         self._unroll_mesh(deformerNodes, meshDict)
-        if skinnedWorks and meshWorks and not animWorks:
+        if meshWorks and not skinnedWorks and not animWorks:
             out_dict = { 'name': None, 'materialfile': None,'mesh': None}
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
             out_dict['materialfile'] = matFilename
-            out_dict['type'] = 'skinned'
+            out_dict['type'] = 'static'
 
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 
@@ -1213,8 +1213,7 @@ class FbxParser:
             print("Done Converting file: Time Taken: {}".format(end - start))
             return
 
-
-        if meshWorks and not skinnedWorks and not animWorks :
+        if skinnedWorks and meshWorks and not animWorks:
             out_dict = {'name' : None, 'mesh': None, 'materialfile': None, 'deformers': None, 'posenodes': None, 'connections': None}
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
@@ -1222,7 +1221,7 @@ class FbxParser:
             out_dict['posenodes'] = poseNodesDict
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
-            out_dict['type'] = 'static'
+            out_dict['type'] = 'skinned'
 
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 

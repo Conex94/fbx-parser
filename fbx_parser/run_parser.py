@@ -89,6 +89,6 @@ def run_skinned_parser_notest():
     fbxparser._convert_auto(results)
 
 if __name__ == '__main__':
-    run_animation_parser_notest()
-    run_static_parser_notest()
+    #run_animation_parser_notest()
+    #run_static_parser_notest()
     run_skinned_parser_notest()
