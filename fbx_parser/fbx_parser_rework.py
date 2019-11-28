@@ -556,7 +556,6 @@ class FbxParser:
         uv_index_lines = list()
 
         if meshlines.__len__() < 1:
-            print('No Mesh data')
             raise Exception('No Mesh data in meshlines')
 
         for line in meshlines:
@@ -1191,20 +1190,31 @@ class FbxParser:
         if animWorks:
             out_dict = {'name': None,'animation': None,}
             out_dict['animation'] = animation_take
-
+            out_dict['type'] = 'animation'
 
             #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
+            end = time.time()
+            print("Done Converting file: Time Taken: {}".format(end - start))
+            return
+
+        #do it for both
         self._unroll_mesh(deformerNodes, meshDict)
-        if not skinnedWorks and meshWorks:
+        if skinnedWorks and meshWorks and not animWorks:
             out_dict = { 'name': None, 'materialfile': None,'mesh': None}
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
             out_dict['materialfile'] = matFilename
+            out_dict['type'] = 'skinned'
 
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 
-        if skinnedWorks:
+            end = time.time()
+            print("Done Converting file: Time Taken: {}".format(end - start))
+            return
+
+
+        if meshWorks and not skinnedWorks and not animWorks :
             out_dict = {'name' : None, 'mesh': None, 'materialfile': None, 'deformers': None, 'posenodes': None, 'connections': None}
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
@@ -1212,15 +1222,17 @@ class FbxParser:
             out_dict['posenodes'] = poseNodesDict
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
+            out_dict['type'] = 'static'
 
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
 
-        end = time.time()
-        print("Done Converting file: Time Taken: {}".format(end - start))
+            end = time.time()
+            print("Done Converting file: Time Taken: {}".format(end - start))
+            return
 
     def _write_output(self, outDict, path_out, filename_out):
 
-        if 'animation' in outDict:
+        if outDict['type'] == 'animation':
             final_string = ""
             final_string += 'name: ' + filename_out + '\n'
             for deformer in outDict['animation']:
@@ -1254,6 +1266,7 @@ class FbxParser:
                 channel_s_z_kd = deformer['channel_scale']['channel_z']['keydistances']
                 channel_s_z_kv = deformer['channel_scale']['channel_z']['keyvalues']
 
+
                 final_string += '<CHANNEL_T_X_KD>\n' + '\n'.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
                 final_string += '<CHANNEL_T_X_KV>\n' + '\n'.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
 
@@ -1262,6 +1275,7 @@ class FbxParser:
 
                 final_string += '<CHANNEL_T_Z_KD>\n' + '\n'.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
                 final_string += '<CHANNEL_T_Z_KV>\n' + '\n'.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
+
 
                 final_string += '<CHANNEL_R_X_KD>\n' + '\n'.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
                 final_string += '<CHANNEL_R_X_KV>\n' + '\n'.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
@@ -1283,19 +1297,22 @@ class FbxParser:
                 final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
 
                 final_string += '</DEFORMER>\n'
-                pass
 
             full_name = os.path.join(path_out,filename_out)
             with open(full_name + '.anim', 'w') as fout:
                 fout.write(final_string)
 
-        if 'name' in outDict and 'mesh' in outDict and 'materialfile' in outDict:
+        if outDict['type'] == 'skinned':
+
+            final_string = ""
+            final_string += 'name: ' + filename_out + '\n'
+            final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
+            final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
+
+        if outDict['type'] == 'static':
+            return
             final_string += 'name: ' + outDict['name'] + '\n'
             final_string += 'material: ' + outDict['materialfile'] + '\n'
-
-            full_name = os.path.join(path_out, filename_out)
-            with open(full_name + '.mesh', 'w') as fout:
-                fout.write(final_string)
 
 
     def _open_file(self, path, filename) -> list():

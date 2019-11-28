@@ -41,7 +41,8 @@ class fbx_parser_tests(unittest.TestCase):
             fbxparser._convert_auto(results)
 
             self.assertTrue(True)
-        except:
+        except Exception as e:
+            print(e)
             self.assertTrue(False)
 
     def test_convert_static(self):
