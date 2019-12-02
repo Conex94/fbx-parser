@@ -1218,7 +1218,7 @@ class FbxParser:
             out_dict['mesh'] = meshDict
             out_dict['name'] = meshName
             out_dict['deformers'] = deformerNodes
-            out_dict['posenodes'] = poseNodesDict
+            out_dict['posenodes'] = poseNodesDict['posenodes']
             out_dict['connections'] = connectionsDict
             out_dict['materialfile'] = matFilename
             out_dict['type'] = 'skinned'
@@ -1230,10 +1230,11 @@ class FbxParser:
             return
 
     def _write_output(self, outDict, path_out, filename_out):
-
         if outDict['type'] == 'animation':
             final_string = ""
             final_string += 'name: ' + filename_out + '\n'
+            final_string += 'type: ' + outDict['type'] + '\n'
+
             for deformer in outDict['animation']:
                 final_string += '<DEFORMER>\n'
                 final_string += 'deformername: {}{}'.format(deformer['deformername'], '\n')
@@ -1297,22 +1298,119 @@ class FbxParser:
 
                 final_string += '</DEFORMER>\n'
 
-            full_name = os.path.join(path_out,filename_out)
-            with open(full_name + '.anim', 'w') as fout:
+            full_name = os.path.join(path_out,filename_out)  + '.anim'
+            with open(full_name, 'w') as fout:
                 fout.write(final_string)
 
         if outDict['type'] == 'skinned':
-
             final_string = ""
-            final_string += 'name: ' + filename_out + '\n'
-            final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
-            final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
-
-        if outDict['type'] == 'static':
-            return
             final_string += 'name: ' + outDict['name'] + '\n'
             final_string += 'material: ' + outDict['materialfile'] + '\n'
+            final_string += 'type: ' + outDict['type'] + '\n'
 
+            final_string += '<POINTSI>' + '\n'
+            final_string += ',\n'.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
+            final_string += '</POINTSI>' + '\n'
+
+            final_string += '<UVI>' + '\n'
+            final_string += ',\n'.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
+            final_string += '</UVI>' + '\n'
+
+            final_string += '<POINTS_3D>' + '\n'
+            for p in outDict['mesh']['points_3d']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</POINTS_3D>' + '\n'
+
+            final_string += '<UV_2D>' + '\n'
+            for p in outDict['mesh']['uv_2d']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</UV_2D>' + '\n'
+
+            final_string += '<NORMALS_UNROLLED>' + '\n'
+            for p in outDict['mesh']['normals_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</NORMALS_UNROLLED>' + '\n'
+
+            final_string += '<UV_UNROLLED>' + '\n'
+            for p in outDict['mesh']['uv_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</UV_UNROLLED>' + '\n'
+
+            final_string += '<POINTS_UNROLLED>' + '\n'
+            for p in outDict['mesh']['points_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</POINTS_UNROLLED>' + '\n'
+
+            final_string += '<CONNECTIONS>' + '\n'
+            for p in outDict['connections']:
+                final_string += p['parent'] + ' ' + p['child'] +'\n'
+            final_string += '</CONNECTIONS>' + '\n'
+
+            final_string += '<POSENODES>' + '\n'
+            for p in outDict['posenodes']:
+                final_string += '<POSENODE>' + '\n'
+                final_string += 'name: ' + p['name'] + '\n'
+                final_string += '<MATRIX>' + '\n'
+                final_string += ',\n'.join([str(e) for e in p['matrix']]) + '\n'
+                final_string += '</MATRIX>' + '\n'
+                final_string += '</POSENODE>' + '\n'
+            final_string += '</POSENODES>' + '\n'
+
+            final_string += '<DEFORMERS>' + '\n'
+            for p in outDict['posenodes']:
+                final_string += '<DEFORMER>' + '\n'
+                final_string += 'name: ' + p['name'] + '\n'
+                final_string += 'matrix: ' + ','.join([str(e) for e in p['matrix']]) + '\n'
+                final_string += '</DEFORMER>' + '\n'
+            final_string += '</DEFORMERS>' + '\n'
+
+            full_name = os.path.join(path_out, filename_out) + '.mesh'
+            with open(full_name, 'w') as fout:
+                fout.write(final_string)
+
+        if outDict['type'] == 'static':
+            final_string = ""
+            final_string += 'name: ' + outDict['name'] + '\n'
+            final_string += 'material: ' + outDict['materialfile'] + '\n'
+            final_string += 'type: ' + outDict['type'] + '\n'
+
+            final_string += '<POINTSI>' + '\n'
+            final_string += ',\n'.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
+            final_string += '</POINTSI>' + '\n'
+
+            final_string += '<UVI>' + '\n'
+            final_string += ',\n'.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
+            final_string += '</UVI>' + '\n'
+
+            final_string += '<POINTS_3D>' + '\n'
+            for p in outDict['mesh']['points_3d']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</POINTS_3D>' + '\n'
+
+
+            final_string += '<UV_2D>' + '\n'
+            for p in outDict['mesh']['uv_2d']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</UV_2D>' + '\n'
+
+            final_string += '<NORMALS_UNROLLED>' + '\n'
+            for p in outDict['mesh']['normals_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</NORMALS_UNROLLED>' + '\n'
+
+            final_string += '<UV_UNROLLED>' + '\n'
+            for p in outDict['mesh']['uv_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</UV_UNROLLED>' + '\n'
+
+            final_string += '<POINTS_UNROLLED>' + '\n'
+            for p in outDict['mesh']['points_unrolled']:
+                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+            final_string += '</POINTS_UNROLLED>' + '\n'
+
+            full_name = os.path.join(path_out, filename_out) + '.mesh'
+            with open(full_name, 'w') as fout:
+                fout.write(final_string)
 
     def _open_file(self, path, filename) -> list():
         '''
@@ -1378,5 +1476,5 @@ if __name__ == '__main__':
 
     fbxparser = FbxParser()
     results = parser.parse_args()
-    fbxparser.convert(results)
+    fbxparser._convert_auto(results)
 
