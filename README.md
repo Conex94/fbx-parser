@@ -1,6 +1,10 @@
-# Project Title
+# FBX-Parser
 
-One Paragraph of project description goes here
+The FBX-Parser is a collection of two programs.
+One Program is the Mesh-Anim-Parser, it can convert FBX-Files to a custom
+made mesh format. The fbx files need to be in fbx 2006.01 Ascii format in order to be used.
+The custom format is a simple to read text representation of the Model or Animation 
+which was stored in the FBX file.
 
 ## Getting Started
 
@@ -8,73 +12,19 @@ These instructions will get you a copy of the project up and running on your loc
 
 ### Prerequisites
 
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
+Python 3.4 or higher, preferable PyCharm Community
 
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+Download python Version 3.4 or higher, run the script with the command-line parameters
 
-Say what the step will be
+## Example run
 
-```
-Give the example
-```
 
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-## Deployment
-
-Add additional notes about how to deploy this on a live system
-
-## Built With
-
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
-
+Just run it
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Nouri Aissaoui** - *complete project* - [Conex94](https://github.com/conex94)
 
 ## License
 
