@@ -1,6 +1,8 @@
+<HEADER>
 name: Model::pCube1
 material: 
 type: skinned
+</HEADER>
 <POINTSI>
 0,
 1,
@@ -427,3 +429,62 @@ type: skinned
 0.5,
 0.5
 </POINTS_UNROLLED>
+<CONNECTIONS>
+Model::pCube1 Model::Scene
+Model::joint1 Model::Scene
+Material::lambert1 Model::pCube1
+</CONNECTIONS>
+<POSENODES>
+<POSENODE>
+name: Model::pCube1
+<MATRIX>
+1.0,
+0.0,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.5,
+0.0,
+1.0
+</MATRIX>
+</POSENODE>
+<POSENODE>
+name: Model::joint1
+<MATRIX>
+1.0,
+0.0,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.0,
+0.0,
+1.0,
+0.0,
+0.0,
+0.0,
+0.0,
+1.0
+</MATRIX>
+</POSENODE>
+</POSENODES>
+<DEFORMERS>
+<DEFORMER>
+name: Model::pCube1
+matrix: 1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.5,0.0,1.0
+</DEFORMER>
+<DEFORMER>
+name: Model::joint1
+matrix: 1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0,0.0,0.0,0.0,0.0,1.0
+</DEFORMER>
+</DEFORMERS>

@@ -1135,7 +1135,6 @@ class FbxParser:
 
         pass
 
-
     def _convert_auto(self, arguments):
         '''
         Lets try parsing different modes and check the outcome, then we will decide on
@@ -1188,9 +1187,10 @@ class FbxParser:
             pass
 
         if animWorks:
-            out_dict = {'name': None,'animation': None,}
+            out_dict = {'name': None, 'animation': None,}
             out_dict['animation'] = animation_take
             out_dict['type'] = 'animation'
+            out_dict['group'] = arguments.group
 
             #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
             self._write_output(out_dict, arguments.path_out, arguments.filename_out)
@@ -1232,8 +1232,11 @@ class FbxParser:
     def _write_output(self, outDict, path_out, filename_out):
         if outDict['type'] == 'animation':
             final_string = ""
+            final_string += '<HEADER>\n'
             final_string += 'name: ' + filename_out + '\n'
             final_string += 'type: ' + outDict['type'] + '\n'
+            final_string += 'group: ' + outDict['group'] + '\n'
+            final_string += '</HEADER>\n'
 
             for deformer in outDict['animation']:
                 final_string += '<DEFORMER>\n'
@@ -1267,34 +1270,34 @@ class FbxParser:
                 channel_s_z_kv = deformer['channel_scale']['channel_z']['keyvalues']
 
 
-                final_string += '<CHANNEL_T_X_KD>\n' + '\n'.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
-                final_string += '<CHANNEL_T_X_KV>\n' + '\n'.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
+                final_string += '<CHANNEL_T_X_KD>\n' + ','.join(map(str, channel_t_x_kd)) + '\n' + '</CHANNEL_T_X_KD>\n'
+                final_string += '<CHANNEL_T_X_KV>\n' + ','.join(map(str, channel_t_x_kv)) + '\n' + '</CHANNEL_T_X_KV>\n'
 
-                final_string += '<CHANNEL_T_Y_KD>\n' + '\n'.join(map(str, channel_t_y_kd)) + '\n' + '</CHANNEL_T_Y_KD>\n'
-                final_string += '<CHANNEL_T_Y_KV>\n' + '\n'.join(map(str, channel_t_y_kv)) + '\n' + '</CHANNEL_T_Y_KV>\n'
+                final_string += '<CHANNEL_T_Y_KD>\n' + ','.join(map(str, channel_t_y_kd)) + '\n' + '</CHANNEL_T_Y_KD>\n'
+                final_string += '<CHANNEL_T_Y_KV>\n' + ','.join(map(str, channel_t_y_kv)) + '\n' + '</CHANNEL_T_Y_KV>\n'
 
-                final_string += '<CHANNEL_T_Z_KD>\n' + '\n'.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
-                final_string += '<CHANNEL_T_Z_KV>\n' + '\n'.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
-
-
-                final_string += '<CHANNEL_R_X_KD>\n' + '\n'.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
-                final_string += '<CHANNEL_R_X_KV>\n' + '\n'.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
-
-                final_string += '<CHANNEL_R_Y_KD>\n' + '\n'.join(map(str, channel_r_y_kd)) + '\n' + '</CHANNEL_R_Y_KD>\n'
-                final_string += '<CHANNEL_R_Y_KV>\n' + '\n'.join(map(str, channel_r_y_kv)) + '\n' + '</CHANNEL_R_Y_KV>\n'
-
-                final_string += '<CHANNEL_R_Z_KD>\n' + '\n'.join(map(str, channel_r_z_kd)) + '\n' + '</CHANNEL_R_Z_KD>\n'
-                final_string += '<CHANNEL_R_Z_KV>\n' + '\n'.join(map(str, channel_r_z_kv)) + '\n' + '</CHANNEL_R_Z_KV>\n'
+                final_string += '<CHANNEL_T_Z_KD>\n' + ','.join(map(str, channel_t_z_kd)) + '\n' + '</CHANNEL_T_Z_KD>\n'
+                final_string += '<CHANNEL_T_Z_KV>\n' + ','.join(map(str, channel_t_z_kv)) + '\n' + '</CHANNEL_T_Z_KV>\n'
 
 
-                final_string += '<CHANNEL_S_X_KD>\n' + '\n'.join(map(str, channel_s_x_kd)) + '\n' + '</CHANNEL_S_X_KD>\n'
-                final_string += '<CHANNEL_S_X_KV>\n' + '\n'.join(map(str, channel_s_x_kv)) + '\n' + '</CHANNEL_S_X_KV>\n'
+                final_string += '<CHANNEL_R_X_KD>\n' + ','.join(map(str, channel_r_x_kd)) + '\n' + '</CHANNEL_R_X_KD>\n'
+                final_string += '<CHANNEL_R_X_KV>\n' + ','.join(map(str, channel_r_x_kv)) + '\n' + '</CHANNEL_R_X_KV>\n'
 
-                final_string += '<CHANNEL_S_Y_KD>\n' + '\n'.join(map(str, channel_s_y_kd)) + '\n' + '</CHANNEL_S_Y_KD>\n'
-                final_string += '<CHANNEL_S_Y_KV>\n' + '\n'.join(map(str, channel_s_y_kv)) + '\n' + '</CHANNEL_S_Y_KV>\n'
+                final_string += '<CHANNEL_R_Y_KD>\n' + ','.join(map(str, channel_r_y_kd)) + '\n' + '</CHANNEL_R_Y_KD>\n'
+                final_string += '<CHANNEL_R_Y_KV>\n' + ','.join(map(str, channel_r_y_kv)) + '\n' + '</CHANNEL_R_Y_KV>\n'
 
-                final_string += '<CHANNEL_S_Z_KD>\n' + '\n'.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
-                final_string += '<CHANNEL_S_Z_KV>\n' + '\n'.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
+                final_string += '<CHANNEL_R_Z_KD>\n' + ','.join(map(str, channel_r_z_kd)) + '\n' + '</CHANNEL_R_Z_KD>\n'
+                final_string += '<CHANNEL_R_Z_KV>\n' + ','.join(map(str, channel_r_z_kv)) + '\n' + '</CHANNEL_R_Z_KV>\n'
+
+
+                final_string += '<CHANNEL_S_X_KD>\n' + ','.join(map(str, channel_s_x_kd)) + '\n' + '</CHANNEL_S_X_KD>\n'
+                final_string += '<CHANNEL_S_X_KV>\n' + ','.join(map(str, channel_s_x_kv)) + '\n' + '</CHANNEL_S_X_KV>\n'
+
+                final_string += '<CHANNEL_S_Y_KD>\n' + ','.join(map(str, channel_s_y_kd)) + '\n' + '</CHANNEL_S_Y_KD>\n'
+                final_string += '<CHANNEL_S_Y_KV>\n' + ','.join(map(str, channel_s_y_kv)) + '\n' + '</CHANNEL_S_Y_KV>\n'
+
+                final_string += '<CHANNEL_S_Z_KD>\n' + ','.join(map(str, channel_s_z_kd)) + '\n' + '</CHANNEL_S_Z_KD>\n'
+                final_string += '<CHANNEL_S_Z_KV>\n' + ','.join(map(str, channel_s_z_kv)) + '\n' + '</CHANNEL_S_Z_KV>\n'
 
                 final_string += '</DEFORMER>\n'
 
@@ -1304,9 +1307,14 @@ class FbxParser:
 
         if outDict['type'] == 'skinned':
             final_string = ""
+            final_string += '<HEADER>\n'
+
             final_string += 'name: ' + outDict['name'] + '\n'
             final_string += 'material: ' + outDict['materialfile'] + '\n'
             final_string += 'type: ' + outDict['type'] + '\n'
+
+            final_string += '</HEADER>\n'
+
 
             final_string += '<POINTSI>' + '\n'
             final_string += ',\n'.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
@@ -1370,42 +1378,53 @@ class FbxParser:
 
         if outDict['type'] == 'static':
             final_string = ""
+
+            final_string += '<HEADER>\n'
+
             final_string += 'name: ' + outDict['name'] + '\n'
             final_string += 'material: ' + outDict['materialfile'] + '\n'
             final_string += 'type: ' + outDict['type'] + '\n'
+            final_string += '</HEADER>\n'
 
             final_string += '<POINTSI>' + '\n'
-            final_string += ',\n'.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
             final_string += '</POINTSI>' + '\n'
 
             final_string += '<UVI>' + '\n'
-            final_string += ',\n'.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['uvi']])
+            final_string += '\n'
             final_string += '</UVI>' + '\n'
 
             final_string += '<POINTS_3D>' + '\n'
             for p in outDict['mesh']['points_3d']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
             final_string += '</POINTS_3D>' + '\n'
 
 
             final_string += '<UV_2D>' + '\n'
             for p in outDict['mesh']['uv_2d']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+                final_string += ','.join([str(e) for e in p])
+
+            final_string += '\n'
             final_string += '</UV_2D>' + '\n'
 
             final_string += '<NORMALS_UNROLLED>' + '\n'
             for p in outDict['mesh']['normals_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
             final_string += '</NORMALS_UNROLLED>' + '\n'
 
             final_string += '<UV_UNROLLED>' + '\n'
             for p in outDict['mesh']['uv_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
             final_string += '</UV_UNROLLED>' + '\n'
 
             final_string += '<POINTS_UNROLLED>' + '\n'
             for p in outDict['mesh']['points_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
             final_string += '</POINTS_UNROLLED>' + '\n'
 
             full_name = os.path.join(path_out, filename_out) + '.mesh'
@@ -1456,6 +1475,7 @@ class FbxParser:
         end = time.time()
 
 if __name__ == '__main__':
+    fbxparser = FbxParser()
 
     parser = argparse.ArgumentParser()
 
@@ -1472,9 +1492,11 @@ if __name__ == '__main__':
                         default=".", help='Enter the target filename')
 
     parser.add_argument('--mode', action='store', dest='mode',
-                        default="model", help='Pick between map or model')
+                        default="", help='Pick between map or model')
 
-    fbxparser = FbxParser()
+    parser.add_argument('--group', action='store', dest='group',
+                        default="None", help='If this Animation is part of a specific Group, like \"Human\"')
+
     results = parser.parse_args()
-    fbxparser._convert_auto(results)
 
+    fbxparser._convert_auto(results)

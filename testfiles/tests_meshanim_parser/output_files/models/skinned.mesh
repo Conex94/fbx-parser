@@ -1,6 +1,8 @@
+<HEADER>
 name: Model::polySurface1
 material: cube
 type: skinned
+</HEADER>
 <POINTSI>
 73,
 97,
