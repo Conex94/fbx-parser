@@ -20,18 +20,11 @@ Download python Version 3.4 or higher, run the script with the command-line para
 
 ## Example run
 
-
 Just run it
 ## Authors
 
-* **Nouri Aissaoui** - *complete project* - [Conex94](https://github.com/conex94)
+**Nouri Aissaoui** - *complete project* - [Conex94](https://github.com/conex94)
 
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
