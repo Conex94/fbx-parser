@@ -1317,37 +1317,37 @@ class FbxParser:
 
 
             final_string += '<POINTSI>' + '\n'
-            final_string += ',\n'.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
             final_string += '</POINTSI>' + '\n'
 
             final_string += '<UVI>' + '\n'
-            final_string += ',\n'.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
             final_string += '</UVI>' + '\n'
 
             final_string += '<POINTS_3D>' + '\n'
             for p in outDict['mesh']['points_3d']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
-            final_string += '</POINTS_3D>' + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n</POINTS_3D>' + '\n'
 
             final_string += '<UV_2D>' + '\n'
             for p in outDict['mesh']['uv_2d']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
-            final_string += '</UV_2D>' + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n</UV_2D>' + '\n'
 
             final_string += '<NORMALS_UNROLLED>' + '\n'
             for p in outDict['mesh']['normals_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
-            final_string += '</NORMALS_UNROLLED>' + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n</NORMALS_UNROLLED>' + '\n'
 
             final_string += '<UV_UNROLLED>' + '\n'
             for p in outDict['mesh']['uv_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
-            final_string += '</UV_UNROLLED>' + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n</UV_UNROLLED>' + '\n'
 
             final_string += '<POINTS_UNROLLED>' + '\n'
             for p in outDict['mesh']['points_unrolled']:
-                final_string += ',\n'.join([str(e) for e in p]) + '\n'
-            final_string += '</POINTS_UNROLLED>' + '\n'
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n</POINTS_UNROLLED>' + '\n'
 
             final_string += '<CONNECTIONS>' + '\n'
             for p in outDict['connections']:
@@ -1359,7 +1359,7 @@ class FbxParser:
                 final_string += '<POSENODE>' + '\n'
                 final_string += 'name: ' + p['name'] + '\n'
                 final_string += '<MATRIX>' + '\n'
-                final_string += ',\n'.join([str(e) for e in p['matrix']]) + '\n'
+                final_string += ','.join([str(e) for e in p['matrix']]) + '\n'
                 final_string += '</MATRIX>' + '\n'
                 final_string += '</POSENODE>' + '\n'
             final_string += '</POSENODES>' + '\n'
