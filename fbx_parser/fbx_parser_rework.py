@@ -1078,7 +1078,6 @@ class FbxParser:
         uvsUnrolled         = []
         pointsUnrolled      = []
 
-
         mesh['points_3d'] = [] #list of tuple for x,y,z
         mesh['uv_2d'] = [] #list of tuple for x,y
         mesh['normals_unrolled'] = [] #list of tuple for x,y
@@ -1117,9 +1116,7 @@ class FbxParser:
                 for y in range(0, len(x['weights'])):
                     current_weight = x['weights'][y]
                     current_index = x['indexes'][y]
-                    if current_weight > 0.05 and \
-                    len(indexesUnrolled[current_index]) < 4 and \
-                    len(weightsUnrolled[current_index]) < 4:
+                    if current_weight > 0.05 and len(indexesUnrolled[current_index]) < 4 and len(weightsUnrolled[current_index]) < 4:
                         weightsUnrolled[current_index].append(current_weight)
                         indexesUnrolled[current_index].append(current_index)
 
@@ -1372,6 +1369,18 @@ class FbxParser:
                 final_string += '</DEFORMER>' + '\n'
             final_string += '</DEFORMERS>' + '\n'
 
+            final_string += '<WEIGHTS>' + '\n'
+            for p in outDict['mesh']['weights']:
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
+            final_string += '</WEIGHTS>' + '\n'
+
+            final_string += '<WEIGHTS>' + '\n'
+            for p in outDict['mesh']['weights']:
+                final_string += ','.join([str(e) for e in p])
+            final_string += '\n'
+            final_string += '</WEIGHTS>' + '\n'
+
             full_name = os.path.join(path_out, filename_out) + '.mesh'
             with open(full_name, 'w') as fout:
                 fout.write(final_string)
@@ -1426,6 +1435,7 @@ class FbxParser:
                 final_string += ','.join([str(e) for e in p])
             final_string += '\n'
             final_string += '</POINTS_UNROLLED>' + '\n'
+
 
             full_name = os.path.join(path_out, filename_out) + '.mesh'
             with open(full_name, 'w') as fout:
