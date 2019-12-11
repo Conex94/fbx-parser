@@ -1074,7 +1074,6 @@ class FbxParser:
         return mesh_lines
 
     def _unroll_mesh(self, defornodes, mesh):
-
         uvsUnrolled         = []
         pointsUnrolled      = []
 
@@ -1227,6 +1226,7 @@ class FbxParser:
             return
 
     def _write_output(self, outDict, path_out, filename_out):
+
         if outDict['type'] == 'animation':
             final_string = ""
             final_string += '<HEADER>\n'
@@ -1302,7 +1302,7 @@ class FbxParser:
             with open(full_name, 'w') as fout:
                 fout.write(final_string)
 
-        if outDict['type'] == 'skinned':
+        if outDict['type'] == 'static' or outDict['type'] == 'skinned':
             final_string = ""
             final_string += '<HEADER>\n'
 
@@ -1311,7 +1311,6 @@ class FbxParser:
             final_string += 'type: ' + outDict['type'] + '\n'
 
             final_string += '</HEADER>\n'
-
 
             final_string += '<POINTSI>' + '\n'
             final_string += ','.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
@@ -1321,122 +1320,93 @@ class FbxParser:
             final_string += ','.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
             final_string += '</UVI>' + '\n'
 
+            strarr = list()
             final_string += '<POINTS_3D>' + '\n'
             for p in outDict['mesh']['points_3d']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n</POINTS_3D>' + '\n'
-
-            final_string += '<UV_2D>' + '\n'
-            for p in outDict['mesh']['uv_2d']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n</UV_2D>' + '\n'
-
-            final_string += '<NORMALS_UNROLLED>' + '\n'
-            for p in outDict['mesh']['normals_unrolled']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n</NORMALS_UNROLLED>' + '\n'
-
-            final_string += '<UV_UNROLLED>' + '\n'
-            for p in outDict['mesh']['uv_unrolled']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n</UV_UNROLLED>' + '\n'
-
-            final_string += '<POINTS_UNROLLED>' + '\n'
-            for p in outDict['mesh']['points_unrolled']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n</POINTS_UNROLLED>' + '\n'
-
-            final_string += '<CONNECTIONS>' + '\n'
-            for p in outDict['connections']:
-                final_string += p['parent'] + ' ' + p['child'] +'\n'
-            final_string += '</CONNECTIONS>' + '\n'
-
-            final_string += '<POSENODES>' + '\n'
-            for p in outDict['posenodes']:
-                final_string += '<POSENODE>' + '\n'
-                final_string += 'name: ' + p['name'] + '\n'
-                final_string += '<MATRIX>' + '\n'
-                final_string += ','.join([str(e) for e in p['matrix']]) + '\n'
-                final_string += '</MATRIX>' + '\n'
-                final_string += '</POSENODE>' + '\n'
-            final_string += '</POSENODES>' + '\n'
-
-            final_string += '<DEFORMERS>' + '\n'
-            for p in outDict['posenodes']:
-                final_string += '<DEFORMER>' + '\n'
-                final_string += 'name: ' + p['name'] + '\n'
-                final_string += 'matrix: ' + ','.join([str(e) for e in p['matrix']]) + '\n'
-                final_string += '</DEFORMER>' + '\n'
-            final_string += '</DEFORMERS>' + '\n'
-
-            final_string += '<WEIGHTS>' + '\n'
-            for p in outDict['mesh']['weight_unrolled']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n'
-            final_string += '</WEIGHTS>' + '\n'
-
-            final_string += '<INDICES>' + '\n'
-            for p in outDict['mesh']['index_unrolled']:
-
-                line = '/'.join([str(e) for e in p])
-                final_string += line + '\n'
-            final_string += '</INDICES>' + '\n'
-
-            full_name = os.path.join(path_out, filename_out) + '.mesh'
-            with open(full_name, 'w') as fout:
-                fout.write(final_string)
-
-        if outDict['type'] == 'static':
-            final_string = ""
-
-            final_string += '<HEADER>\n'
-
-            final_string += 'name: ' + outDict['name'] + '\n'
-            final_string += 'material: ' + outDict['materialfile'] + '\n'
-            final_string += 'type: ' + outDict['type'] + '\n'
-            final_string += '</HEADER>\n'
-
-            final_string += '<POINTSI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
-            final_string += '</POINTSI>' + '\n'
-
-            final_string += '<UVI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['mesh']['uvi']])
-            final_string += '\n'
-            final_string += '</UVI>' + '\n'
-
-            final_string += '<POINTS_3D>' + '\n'
-            for p in outDict['mesh']['points_3d']:
-                final_string += ','.join([str(e) for e in p])
+                strarr.append(','.join([str(e) for e in p]))
+            final_string += '//'.join(strarr)
             final_string += '\n'
             final_string += '</POINTS_3D>' + '\n'
 
-
+            strarr = list()
             final_string += '<UV_2D>' + '\n'
             for p in outDict['mesh']['uv_2d']:
-                final_string += ','.join([str(e) for e in p])
-
+                strarr.append(','.join([str(e) for e in p]))
+            final_string += '//'.join(strarr)
             final_string += '\n'
             final_string += '</UV_2D>' + '\n'
 
+            strarr = list()
             final_string += '<NORMALS_UNROLLED>' + '\n'
             for p in outDict['mesh']['normals_unrolled']:
-                final_string += ','.join([str(e) for e in p])
+                strarr.append(','.join([str(e) for e in p]))
+            final_string += '//'.join(strarr)
             final_string += '\n'
             final_string += '</NORMALS_UNROLLED>' + '\n'
 
+            strarr = list()
             final_string += '<UV_UNROLLED>' + '\n'
             for p in outDict['mesh']['uv_unrolled']:
-                final_string += ','.join([str(e) for e in p])
+                strarr.append(','.join([str(e) for e in p]))
+            final_string += '//'.join(strarr)
             final_string += '\n'
             final_string += '</UV_UNROLLED>' + '\n'
 
+            strarr = list()
             final_string += '<POINTS_UNROLLED>' + '\n'
             for p in outDict['mesh']['points_unrolled']:
-                final_string += ','.join([str(e) for e in p])
+                strarr.append(','.join([str(e) for e in p]))
+            final_string += '//'.join(strarr)
             final_string += '\n'
             final_string += '</POINTS_UNROLLED>' + '\n'
 
+            if outDict['type'] == 'skinned':
+                final_string += '<CONNECTIONS>' + '\n'
+                for p in outDict['connections']:
+                    final_string += p['parent'] + ' ' + p['child'] +'\n'
+                final_string += '</CONNECTIONS>' + '\n'
+
+                final_string += '<POSENODES>' + '\n'
+                for p in outDict['posenodes']:
+                    final_string += '<POSENODE>' + '\n'
+                    final_string += 'name: ' + p['name'] + '\n'
+
+                    final_string += 'matrix: ' + ','.join([str(e) for e in p['matrix']]) + '\n'
+
+                    final_string += '</POSENODE>' + '\n'
+                final_string += '</POSENODES>' + '\n'
+
+                final_string += '<DEFORMERS>' + '\n'
+                for p in outDict['deformers']:
+                    final_string += '<DEFORMER>' + '\n'
+                    final_string += 'name: ' + p['name'] + '\n'
+                    final_string += 'weights: ' + ','.join([str(e) for e in p['weights']]) + '\n'
+                    final_string += 'indices: ' + ','.join([str(e) for e in p['indexes']]) + '\n'
+                    final_string += 'transformlink: ' + ','.join([str(e) for e in p['transformlink']]) + '\n'
+                    final_string += '</DEFORMER>' + '\n'
+                final_string += '</DEFORMERS>' + '\n'
+
+                '''The Following lists contain the Deformers-indices and weights, which affects each vertex of the model'''
+
+                strarr = list()
+                final_string += '<WEIGHTS>' + '\n'
+                for p in outDict['mesh']['weight_unrolled']:
+                    strarr.append(','.join([str(e) for e in p]))
+                final_string += '//'.join(strarr)
+                final_string += '\n'
+                final_string += '</WEIGHTS>' + '\n'
+
+                strarr = list()
+                final_string += '<INDICES>' + '\n'
+                for p in outDict['mesh']['index_unrolled']:
+                    strarr.append(','.join([str(e) for e in p]))
+                final_string += '//'.join(strarr)
+                final_string += '\n'
+                final_string += '</INDICES>' + '\n'
+
+                full_name = os.path.join(path_out, filename_out) + '.mesh'
+                with open(full_name, 'w') as fout:
+                    fout.write(final_string)
 
             full_name = os.path.join(path_out, filename_out) + '.mesh'
             with open(full_name, 'w') as fout:
