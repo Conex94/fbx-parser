@@ -1370,16 +1370,17 @@ class FbxParser:
             final_string += '</DEFORMERS>' + '\n'
 
             final_string += '<WEIGHTS>' + '\n'
-            for p in outDict['mesh']['weights']:
+            for p in outDict['mesh']['weight_unrolled']:
                 final_string += ','.join([str(e) for e in p])
             final_string += '\n'
             final_string += '</WEIGHTS>' + '\n'
 
-            final_string += '<WEIGHTS>' + '\n'
-            for p in outDict['mesh']['weights']:
-                final_string += ','.join([str(e) for e in p])
-            final_string += '\n'
-            final_string += '</WEIGHTS>' + '\n'
+            final_string += '<INDICES>' + '\n'
+            for p in outDict['mesh']['index_unrolled']:
+
+                line = '/'.join([str(e) for e in p])
+                final_string += line + '\n'
+            final_string += '</INDICES>' + '\n'
 
             full_name = os.path.join(path_out, filename_out) + '.mesh'
             with open(full_name, 'w') as fout:
