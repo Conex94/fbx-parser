@@ -1324,7 +1324,7 @@ class FbxParser:
             final_string += '<POINTS_3D>' + '\n'
             for p in outDict['mesh']['points_3d']:
                 strarr.append(','.join([str(e) for e in p]))
-            final_string += '//'.join(strarr)
+            final_string += ','.join(strarr)
             final_string += '\n'
             final_string += '</POINTS_3D>' + '\n'
 
@@ -1332,7 +1332,7 @@ class FbxParser:
             final_string += '<UV_2D>' + '\n'
             for p in outDict['mesh']['uv_2d']:
                 strarr.append(','.join([str(e) for e in p]))
-            final_string += '//'.join(strarr)
+            final_string += ','.join(strarr)
             final_string += '\n'
             final_string += '</UV_2D>' + '\n'
 
@@ -1340,7 +1340,7 @@ class FbxParser:
             final_string += '<NORMALS_UNROLLED>' + '\n'
             for p in outDict['mesh']['normals_unrolled']:
                 strarr.append(','.join([str(e) for e in p]))
-            final_string += '//'.join(strarr)
+            final_string += ','.join(strarr)
             final_string += '\n'
             final_string += '</NORMALS_UNROLLED>' + '\n'
 
@@ -1348,7 +1348,7 @@ class FbxParser:
             final_string += '<UV_UNROLLED>' + '\n'
             for p in outDict['mesh']['uv_unrolled']:
                 strarr.append(','.join([str(e) for e in p]))
-            final_string += '//'.join(strarr)
+            final_string += ','.join(strarr)
             final_string += '\n'
             final_string += '</UV_UNROLLED>' + '\n'
 
@@ -1356,7 +1356,7 @@ class FbxParser:
             final_string += '<POINTS_UNROLLED>' + '\n'
             for p in outDict['mesh']['points_unrolled']:
                 strarr.append(','.join([str(e) for e in p]))
-            final_string += '//'.join(strarr)
+            final_string += ','.join(strarr)
             final_string += '\n'
             final_string += '</POINTS_UNROLLED>' + '\n'
 
