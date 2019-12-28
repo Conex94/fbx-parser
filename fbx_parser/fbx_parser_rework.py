@@ -1383,6 +1383,7 @@ class FbxParser:
                     final_string += 'weights: ' + ','.join([str(e) for e in p['weights']]) + '\n'
                     final_string += 'indices: ' + ','.join([str(e) for e in p['indexes']]) + '\n'
                     final_string += 'transformlink: ' + ','.join([str(e) for e in p['transformlink']]) + '\n'
+                    final_string += 'transform: ' + ','.join([str(e) for e in p['transform']]) + '\n'
                     final_string += '</DEFORMER>' + '\n'
                 final_string += '</DEFORMERS>' + '\n'
 
@@ -1392,7 +1393,7 @@ class FbxParser:
                 final_string += '<WEIGHTS>' + '\n'
                 for p in outDict['mesh']['weight_unrolled']:
                     strarr.append(','.join([str(e) for e in p]))
-                final_string += '//'.join(strarr)
+                final_string += '\\'.join(strarr)
                 final_string += '\n'
                 final_string += '</WEIGHTS>' + '\n'
 
@@ -1400,7 +1401,7 @@ class FbxParser:
                 final_string += '<INDICES>' + '\n'
                 for p in outDict['mesh']['index_unrolled']:
                     strarr.append(','.join([str(e) for e in p]))
-                final_string += '//'.join(strarr)
+                final_string += '\\'.join(strarr)
                 final_string += '\n'
                 final_string += '</INDICES>' + '\n'
 
