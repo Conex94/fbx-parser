@@ -699,7 +699,7 @@ class FBX_MAP_READER:
         fbx_file_scopes_as_string = dict()
 
         #get all lines from file
-        fbx_data            = FBX_MAP_READER.read_file("filein.fbx")
+        fbx_data            = FBX_MAP_READER.read_file("map.fbx")
 
         #get fbx Objects as scopes
         object_lines        = FBX_MAP_READER.get_fbxobjectslines(fbx_data)

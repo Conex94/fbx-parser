@@ -1,0 +1,10 @@
+<ModelShader>
+diffuse: texture_l_34.tga
+normal: 
+specular: 
+animated: no
+cubemap: no
+rows: 1
+columns: 1
+count: 1
+step: 1
