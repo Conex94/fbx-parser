@@ -1,7 +1,7 @@
 import unittest
 import argparse
 
-from fbx_parser_rework import FbxParser
+from fbx_parser.fbx_parser_rework import FbxParser
 
 
 def run_animation_parser_notest():
@@ -28,9 +28,9 @@ def run_animation_parser_notest():
 
     results = parser.parse_args()
 
-    results.path_in = '..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
+    results.path_in = '..//..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
     results.filename_in = 'test_animation.fbx'
-    results.path_out = '..//testfiles//tests_meshanim_parser//output_files//animation'
+    results.path_out = '..//..//testfiles//tests_meshanim_parser//output_files//animation'
     results.filename_out = 'animation'
 
     fbxparser._convert_auto(results)
@@ -59,9 +59,9 @@ def run_static_parser_notest():
 
     results = parser.parse_args()
 
-    results.path_in = '..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
+    results.path_in = '..//..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
     results.filename_in = 'test_sphere.fbx'
-    results.path_out = '..//testfiles//tests_meshanim_parser//output_files//models'
+    results.path_out = '..//..//testfiles//tests_meshanim_parser//output_files//models'
     results.filename_out = 'sphere'
 
     fbxparser._convert_auto(results)
@@ -84,9 +84,9 @@ def run_single_skinned_parser_notest():
 
     results = parser.parse_args()
 
-    results.path_in = '..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
+    results.path_in = '..//..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
     results.filename_in = 'test_single_skinned.fbx'
-    results.path_out = '..//testfiles//tests_meshanim_parser//output_files//models'
+    results.path_out = '..//..//testfiles//tests_meshanim_parser//output_files//models'
     results.filename_out = 'single_skinned'
 
     fbxparser._convert_auto(results)
@@ -109,15 +109,15 @@ def run_skinned_parser_notest():
 
     results = parser.parse_args()
 
-    results.path_in = '..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
+    results.path_in = '..//..//testfiles//tests_meshanim_parser//input_files//fbxfiles'
     results.filename_in = 'test_skinned.fbx'
-    results.path_out = '..//testfiles//tests_meshanim_parser//output_files//models'
+    results.path_out = '..//..//testfiles//tests_meshanim_parser//output_files//models'
     results.filename_out = 'skinned'
 
     fbxparser._convert_auto(results)
 
 if __name__ == '__main__':
-    run_animation_parser_notest()
-    run_static_parser_notest()
+    #run_animation_parser_notest()
+    #run_static_parser_notest()
     run_skinned_parser_notest()
-    run_single_skinned_parser_notest()
+    #run_single_skinned_parser_notest()

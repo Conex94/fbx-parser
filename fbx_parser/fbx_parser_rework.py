@@ -656,10 +656,10 @@ class FbxParser:
             else:
                 newpointi.append(x)
 
-        mesh_dict = {'points':  pointList,
+        mesh_dict = {'points_raw':  pointList,
                      'pointsi': newpointi,
-                     'normals': normalsList,
-                     'uv':      uvList,
+                     'normals_raw': normalsList,
+                     'uv_raw':      uvList,
                      'uvi':     uviList}
 
         return mesh_dict
@@ -1074,56 +1074,85 @@ class FbxParser:
         return mesh_lines
 
     def _unroll_mesh(self, defornodes, mesh):
-        uvsUnrolled         = []
-        pointsUnrolled      = []
-
         mesh['points_3d'] = [] #list of tuple for x,y,z
         mesh['uv_2d'] = [] #list of tuple for x,y
-        mesh['normals_unrolled'] = [] #list of tuple for x,y
+        mesh['normals_3d'] = [] #list of tuple for x,y
 
+        mesh['points_3d_unrolled'] = [] #list of tuple for x,y
+        mesh['uv_2d_unrolled'] = [] #list of tuple for x,y
+        mesh['normals_3d_unrolled'] = [] #list of tuple for x,y
+
+        mesh['normals_unrolled_raw'] = [] #list of tuple for x,y
+        mesh['uv_unrolled_raw'] = [] #list of tuple for x,y
+        mesh['points_unrolled_raw'] = [] #list of tuple for x,y
+
+
+
+        # Convert from Float lists to lists of vectors first
         counter = 0
-        while counter < len(mesh['points']):
-            point = (mesh['points'][counter], mesh['points'][counter+1], mesh['points'][counter+2])
+        while counter < len(mesh['points_raw']):
+            point = (mesh['points_raw'][counter], mesh['points_raw'][counter+1], mesh['points_raw'][counter+2])
             mesh['points_3d'].append(point)
             counter += 3
 
         counter = 0
-        while counter < len(mesh['normals']):
-            point = (mesh['normals'][counter], mesh['normals'][counter+1], mesh['normals'][counter+2])
-            mesh['normals_unrolled'].append(point)
+        while counter < len(mesh['normals_raw']):
+            point = (mesh['normals_raw'][counter], mesh['normals_raw'][counter+1], mesh['normals_raw'][counter+2])
+            mesh['normals_3d'].append(point)
             counter += 3
 
         counter = 0
-        while counter < len(mesh['uv']):
-            point = (mesh['uv'][counter],mesh['uv'][counter+1])
+        while counter < len(mesh['uv_raw']):
+            point = (mesh['uv_raw'][counter], mesh['uv_raw'][counter+1])
             mesh['uv_2d'].append(point)
             counter += 2
 
+        # now unroll all the 3D data using the index values
         for i in range(0, len(mesh['pointsi'])):
             Entry = mesh['points_3d'][mesh['pointsi'][i]]
-            pointsUnrolled.append(Entry)
+            mesh['points_3d_unrolled'].append(Entry)
 
         for i in range(0, len(mesh['uvi'])):
             Entry = mesh['uv_2d'][mesh['uvi'][i]]
-            uvsUnrolled.append(Entry)
+            mesh['uv_2d_unrolled'].append(Entry)
 
-        weightsUnrolled = [ [] for a in mesh['points_3d']]
-        indexesUnrolled = [ [] for a in mesh['points_3d']]
+        #if the normals_3d are not unrolled, they will be
+        if ( len(mesh['normals_3d']) > len(mesh['points_3d'])):
+            mesh['normals_3d_unrolled'] = mesh['normals_3d']
+        else:
+            for i in range(0, len(mesh['pointsi'])):
+                Entry = mesh['normals_3d'][mesh['pointsi'][i]]
+                mesh['normals_3d_unrolled'].append(Entry)
+
+        for v in mesh['normals_3d_unrolled']:
+            mesh['normals_unrolled_raw'].append(v[0])
+            mesh['normals_unrolled_raw'].append(v[1])
+            mesh['normals_unrolled_raw'].append(v[2])
+
+        for v in mesh['uv_2d_unrolled']:
+            mesh['uv_unrolled_raw'].append(v[0])
+            mesh['uv_unrolled_raw'].append(v[1])
+
+        for v in mesh['points_3d_unrolled']:
+            mesh['points_unrolled_raw'].append(v[0])
+            mesh['points_unrolled_raw'].append(v[1])
+            mesh['points_unrolled_raw'].append(v[2])
+
+        weights_per_vertex = [ [] for a in mesh['points_3d']]
+        indexes_per_vertex = [ [] for a in mesh['points_3d']]
 
         if any(defornodes):
             for x in defornodes:
                 for y in range(0, len(x['weights'])):
                     current_weight = x['weights'][y]
                     current_index = x['indexes'][y]
-                    if current_weight > 0.05 and len(indexesUnrolled[current_index]) < 4 and len(weightsUnrolled[current_index]) < 4:
-                        weightsUnrolled[current_index].append(current_weight)
-                        indexesUnrolled[current_index].append(current_index)
+                    if current_weight > 0.05 and len(indexes_per_vertex[current_index]) < 4 and len(weights_per_vertex[current_index]) < 4:
+                        weights_per_vertex[current_index].append(current_weight)
+                        indexes_per_vertex[current_index].append(current_index)
 
+            #fix this
             mesh['index_unrolled'] = indexesUnrolled
             mesh['weight_unrolled'] = weightsUnrolled
-
-        mesh['uv_unrolled'] = uvsUnrolled
-        mesh['points_unrolled'] = pointsUnrolled
 
         del mesh['points']
         del mesh['normals']
@@ -1427,7 +1456,7 @@ class FbxParser:
         if not '.fbx' in filename:
             filename = "{}{}".format(filename, '.fbx')
 
-        pathname = os.path.join(path,filename)
+        pathname = os.path.join(path, filename)
 
         with open(pathname, 'r') as fin:
             file_lines = fin.readlines()

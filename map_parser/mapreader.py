@@ -694,12 +694,15 @@ class FBX_MAP_READER:
 
         for i in range(0, len(arguments), 2):
             keystr = arguments[i+0]
-            args_dict.update(  { keystr : arguments[i+1]} )
+            args_dict.update({keystr: arguments[i+1]})
+
+        filenamein = "fuck.fbx"
+        filenameout = filenamein.split('.')[0]
 
         fbx_file_scopes_as_string = dict()
 
         #get all lines from file
-        fbx_data            = FBX_MAP_READER.read_file("map.fbx")
+        fbx_data            = FBX_MAP_READER.read_file(filenamein)
 
         #get fbx Objects as scopes
         object_lines        = FBX_MAP_READER.get_fbxobjectslines(fbx_data)
@@ -721,7 +724,6 @@ class FBX_MAP_READER:
         connection_lines    = FBX_MAP_READER.get_fbxconnectionslines(fbx_data)
         connections_dict    = FBX_MAP_READER.create_connection_dict(connection_lines)
 
-
         materials_dict   = FBX_MAP_READER.seperate_materials(objects_lines_scoped)
 
         #FBX_MAP_READER.seperate_fbx_objects()
@@ -736,11 +738,11 @@ class FBX_MAP_READER:
         for i in  range(0, len(lines)):
             lines[i] += "\n"
 
-        with open("output" + ".json", 'w') as d:
+        with open(filenameout + ".json", 'w') as d:
             import json
             d.write(json.dumps(out_dict, indent=4))
 
-        with open("output" + ".custom", 'w') as d:
+        with open(filenameout + ".custom", 'w') as d:
             d.writelines(lines)
 
 if __name__ == '__main__':
