@@ -1074,72 +1074,89 @@ class FbxParser:
         return mesh_lines
 
     def _unroll_mesh(self, defornodes, mesh):
-        mesh['points_3d'] = [] #list of tuple for x,y,z
-        mesh['uv_2d'] = [] #list of tuple for x,y
-        mesh['normals_3d'] = [] #list of tuple for x,y
 
-        mesh['points_3d_unrolled'] = [] #list of tuple for x,y
-        mesh['uv_2d_unrolled'] = [] #list of tuple for x,y
-        mesh['normals_3d_unrolled'] = [] #list of tuple for x,y
+        mesh['rolled_data'] = {}
+        mesh['unrolled_data'] = {}
+        mesh['unrolled_data_raw'] = {}
+        mesh['indices'] = {}
 
-        mesh['normals_unrolled_raw'] = [] #list of tuple for x,y
-        mesh['uv_unrolled_raw'] = [] #list of tuple for x,y
-        mesh['points_unrolled_raw'] = [] #list of tuple for x,y
+        # optimised version
+        mesh['rolled_data']['points_3d']        = [] #list of tuple for x,y,z
+        mesh['rolled_data']['uv_2d']            = [] #list of tuple for x,y
+        mesh['rolled_data']['normals_3d']       = [] #list of tuple for x,y
+        mesh['indices']['pointsi']              = mesh['pointsi'] #list of tuple for x,y
+        mesh['indices']['uvi']                  = mesh['uvi'] #list of tuple for x,y
+        mesh['rolled_data']['index_indexed']    = []
+        mesh['rolled_data']['weight_indexed']   = []
 
+        # not optimised version
+        mesh['unrolled_data']['points_3d_unrolled'] = [] #list of tuple for x,y
+        mesh['unrolled_data']['uv_2d_unrolled'] = [] #list of tuple for x,y
+        mesh['unrolled_data']['normals_3d_unrolled'] = [] #list of tuple for x,y
+        mesh['unrolled_data']['weights_unrolled'] = []
+        mesh['unrolled_data']['indices_unrolled'] = []
 
+        # not optimised, raw lines
+        mesh['unrolled_data_raw']['normals_unrolled_raw'] = [] #list of tuple for x,y
+        mesh['unrolled_data_raw']['uv_unrolled_raw'] = [] #list of tuple for x,y
+        mesh['unrolled_data_raw']['points_unrolled_raw'] = [] #list of tuple for x,y
 
         # Convert from Float lists to lists of vectors first
+        # Finish!
         counter = 0
         while counter < len(mesh['points_raw']):
             point = (mesh['points_raw'][counter], mesh['points_raw'][counter+1], mesh['points_raw'][counter+2])
-            mesh['points_3d'].append(point)
+            mesh['rolled_data']['points_3d'].append(point)
             counter += 3
 
+        # Finish!
         counter = 0
         while counter < len(mesh['normals_raw']):
             point = (mesh['normals_raw'][counter], mesh['normals_raw'][counter+1], mesh['normals_raw'][counter+2])
-            mesh['normals_3d'].append(point)
+            mesh['rolled_data']['normals_3d'].append(point)
             counter += 3
 
+        # Finish!
         counter = 0
         while counter < len(mesh['uv_raw']):
             point = (mesh['uv_raw'][counter], mesh['uv_raw'][counter+1])
-            mesh['uv_2d'].append(point)
+            mesh['rolled_data']['uv_2d'].append(point)
             counter += 2
 
         # now unroll all the 3D data using the index values
-        for i in range(0, len(mesh['pointsi'])):
-            Entry = mesh['points_3d'][mesh['pointsi'][i]]
-            mesh['points_3d_unrolled'].append(Entry)
+        for i in range(0, len(mesh['indices']['pointsi'])):
+            Entry = mesh['rolled_data']['points_3d'][mesh['indices']['pointsi'][i]]
+            mesh['unrolled_data']['points_3d_unrolled'].append(Entry)
 
-        for i in range(0, len(mesh['uvi'])):
-            Entry = mesh['uv_2d'][mesh['uvi'][i]]
-            mesh['uv_2d_unrolled'].append(Entry)
+        for i in range(0, len(mesh['indices']['uvi'])):
+            Entry = mesh['rolled_data']['uv_2d'][mesh['indices']['uvi'][i]]
+            mesh['unrolled_data']['uv_2d_unrolled'].append(Entry)
 
         #if the normals_3d are not unrolled, they will be
-        if ( len(mesh['normals_3d']) > len(mesh['points_3d'])):
-            mesh['normals_3d_unrolled'] = mesh['normals_3d']
+        if ( len(mesh['rolled_data']['normals_3d']) > len(mesh['rolled_data']['points_3d'])):
+            mesh['unrolled_data']['normals_3d_unrolled'] = mesh['rolled_data']['normals_3d']
         else:
-            for i in range(0, len(mesh['pointsi'])):
-                Entry = mesh['normals_3d'][mesh['pointsi'][i]]
-                mesh['normals_3d_unrolled'].append(Entry)
+            for i in range(0, len(mesh['indices']['pointsi'])):
+                Entry = mesh['rolled_data']['normals_3d'][mesh['indices']['pointsi'][i]]
+                mesh['unrolled_data']['normals_3d_unrolled'].append(Entry)
 
-        for v in mesh['normals_3d_unrolled']:
-            mesh['normals_unrolled_raw'].append(v[0])
-            mesh['normals_unrolled_raw'].append(v[1])
-            mesh['normals_unrolled_raw'].append(v[2])
+        for v in mesh['unrolled_data']['normals_3d_unrolled']:
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[0])
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[1])
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[2])
 
-        for v in mesh['uv_2d_unrolled']:
-            mesh['uv_unrolled_raw'].append(v[0])
-            mesh['uv_unrolled_raw'].append(v[1])
+        for v in mesh['unrolled_data']['uv_2d_unrolled']:
+            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(v[0])
+            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(v[1])
 
-        for v in mesh['points_3d_unrolled']:
-            mesh['points_unrolled_raw'].append(v[0])
-            mesh['points_unrolled_raw'].append(v[1])
-            mesh['points_unrolled_raw'].append(v[2])
+        for v in mesh['unrolled_data']['points_3d_unrolled']:
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[0])
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[1])
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[2])
 
-        weights_per_vertex = [ [] for a in mesh['points_3d']]
-        indexes_per_vertex = [ [] for a in mesh['points_3d']]
+        weights_per_vertex = [ [] for a in mesh['rolled_data']['points_3d']]
+        indexes_per_vertex = [ [] for a in mesh['rolled_data']['points_3d']]
+
 
         if any(defornodes):
             for x in defornodes:
@@ -1150,13 +1167,40 @@ class FbxParser:
                         weights_per_vertex[current_index].append(current_weight)
                         indexes_per_vertex[current_index].append(current_index)
 
-            #fix this
-            mesh['index_unrolled'] = indexesUnrolled
-            mesh['weight_unrolled'] = weightsUnrolled
+            mesh['rolled_data']['index_indexed'] = indexes_per_vertex
+            mesh['rolled_data']['weight_indexed'] = weights_per_vertex
 
-        del mesh['points']
-        del mesh['normals']
-        del mesh['uv']
+            # now unroll all the weight and index data using the index values of the points (the right ones=
+            for i in range(0, len(mesh['indices']['pointsi'])):
+                entry_w = mesh['rolled_data']['weight_indexed'][mesh['indices']['pointsi'][i]]
+                mesh['unrolled_data']['weights_unrolled'].append(entry_w)
+
+                entry_i = mesh['rolled_data']['index_indexed'][mesh['indices']['pointsi'][i]]
+                mesh['unrolled_data']['indices_unrolled'].append(entry_i)
+
+
+
+            mesh['unrolled_data_raw']['indices_unrolled_raw'] = []
+            mesh['unrolled_data_raw']['weights_unrolled_raw'] = []
+
+            for v in mesh['unrolled_data']['indices_unrolled']:
+                if len(v) >  0: mesh['unrolled_data_raw']['indices_unrolled_raw'].append(v[0])
+                if len(v) >  1: mesh['unrolled_data_raw']['indices_unrolled_raw'].append(v[1])
+                if len(v) >  2: mesh['unrolled_data_raw']['indices_unrolled_raw'].append(v[2])
+                if len(v) >  3: mesh['unrolled_data_raw']['indices_unrolled_raw'].append(v[3])
+
+                pad = 4 - len(v)
+                for a in range(0, pad): mesh['unrolled_data_raw']['indices_unrolled_raw'].append(0)
+
+
+            for v in mesh['unrolled_data']['weights_unrolled']:
+                if len(v) >  0: mesh['unrolled_data_raw']['weights_unrolled_raw'].append(v[0])
+                if len(v) >  1: mesh['unrolled_data_raw']['weights_unrolled_raw'].append(v[1])
+                if len(v) >  2: mesh['unrolled_data_raw']['weights_unrolled_raw'].append(v[2])
+                if len(v) >  3: mesh['unrolled_data_raw']['weights_unrolled_raw'].append(v[3])
+
+                pad = 4 - len(v)
+                for a in range(0, pad): mesh['unrolled_data_raw']['weights_unrolled_raw'].append(0)
 
         pass
 
@@ -1255,6 +1299,35 @@ class FbxParser:
             return
 
     def _write_output(self, outDict, path_out, filename_out):
+        with open('data.json', 'w') as f:
+            import json
+            f.write(json.dumps(outDict, indent=4, sort_keys=True))
+
+        #mesh['rolled_data'] = {}
+        #mesh['unrolled_data'] = {}
+        #mesh['unrolled_data_raw'] = {}
+        #mesh['indices'] = {}
+
+        # optimised version
+        #mesh['rolled_data']['points_3d'] = []  # list of tuple for x,y,z
+       # mesh['rolled_data']['uv_2d'] = []  # list of tuple for x,y
+        #mesh['rolled_data']['normals_3d'] = []  # list of tuple for x,y
+        #mesh['indices']['pointsi'] = mesh['pointsi']  # list of tuple for x,y
+        #mesh['indices']['uvi'] = mesh['uvi']  # list of tuple for x,y
+        #mesh['rolled_data']['index_indexed'] = []
+        #mesh['rolled_data']['weight_indexed'] = []
+
+        # not optimised version
+        #mesh['unrolled_data']['points_3d_unrolled'] = []  # list of tuple for x,y
+        #mesh['unrolled_data']['uv_2d_unrolled'] = []  # list of tuple for x,y
+        #mesh['unrolled_data']['normals_3d_unrolled'] = []  # list of tuple for x,y
+        #mesh['unrolled_data']['weights_unrolled'] = []
+        #mesh['unrolled_data']['indices_unrolled'] = []
+
+        # not optimised, raw lines
+        #mesh['unrolled_data_raw']['normals_unrolled_raw'] = []  # list of tuple for x,y
+        #mesh['unrolled_data_raw']['uv_unrolled_raw'] = []  # list of tuple for x,y
+        #mesh['unrolled_data_raw']['points_unrolled_raw'] = []  # list of tuple for x,y
 
         if outDict['type'] == 'animation':
             final_string = ""
@@ -1342,26 +1415,22 @@ class FbxParser:
             final_string += '</HEADER>\n'
 
             final_string += '<POINTSI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['mesh']['pointsi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['indices']['pointsi']]) + '\n'
             final_string += '</POINTSI>' + '\n'
 
             final_string += '<UVI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['mesh']['uvi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['indices']['uvi']]) + '\n'
             final_string += '</UVI>' + '\n'
 
             strarr = list()
             final_string += '<POINTS_3D>' + '\n'
-            for p in outDict['mesh']['points_3d']:
-                strarr.append(','.join([str(e) for e in p]))
-            final_string += ','.join(strarr)
+            final_string += ','.join(outDict['unrolled_data_raw']['points_unrolled_raw'])
             final_string += '\n'
             final_string += '</POINTS_3D>' + '\n'
 
             strarr = list()
             final_string += '<UV_2D>' + '\n'
-            for p in outDict['mesh']['uv_2d']:
-                strarr.append(','.join([str(e) for e in p]))
-            final_string += ','.join(strarr)
+            final_string += ','.join(outDict['unrolled_data_raw']['uv_unrolled_raw'])
             final_string += '\n'
             final_string += '</UV_2D>' + '\n'
 
