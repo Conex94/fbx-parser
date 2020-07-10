@@ -1141,18 +1141,18 @@ class FbxParser:
                 mesh['unrolled_data']['normals_3d_unrolled'].append(Entry)
 
         for v in mesh['unrolled_data']['normals_3d_unrolled']:
-            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[0])
-            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[1])
-            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(v[2])
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(str(v[0]))
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(str(v[1]))
+            mesh['unrolled_data_raw']['normals_unrolled_raw'].append(str(v[2]))
 
         for v in mesh['unrolled_data']['uv_2d_unrolled']:
-            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(v[0])
-            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(v[1])
+            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(str(v[0]))
+            mesh['unrolled_data_raw']['uv_unrolled_raw'].append(str(v[1]))
 
         for v in mesh['unrolled_data']['points_3d_unrolled']:
-            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[0])
-            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[1])
-            mesh['unrolled_data_raw']['points_unrolled_raw'].append(v[2])
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(str(v[0]))
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(str(v[1]))
+            mesh['unrolled_data_raw']['points_unrolled_raw'].append(str(v[2]))
 
         weights_per_vertex = [ [] for a in mesh['rolled_data']['points_3d']]
         indexes_per_vertex = [ [] for a in mesh['rolled_data']['points_3d']]
@@ -1415,48 +1415,30 @@ class FbxParser:
             final_string += '</HEADER>\n'
 
             final_string += '<POINTSI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['indices']['pointsi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['indices']['pointsi']]) + '\n'
             final_string += '</POINTSI>' + '\n'
 
             final_string += '<UVI>' + '\n'
-            final_string += ','.join([str(e) for e in outDict['indices']['uvi']]) + '\n'
+            final_string += ','.join([str(e) for e in outDict['mesh']['indices']['uvi']]) + '\n'
             final_string += '</UVI>' + '\n'
 
             strarr = list()
-            final_string += '<POINTS_3D>' + '\n'
-            final_string += ','.join(outDict['unrolled_data_raw']['points_unrolled_raw'])
+            final_string += '<points_unrolled_raw>' + '\n'
+            final_string += ','.join(outDict['mesh']['unrolled_data_raw']['points_unrolled_raw'])
             final_string += '\n'
-            final_string += '</POINTS_3D>' + '\n'
+            final_string += '</points_unrolled_raw>' + '\n'
 
             strarr = list()
-            final_string += '<UV_2D>' + '\n'
-            final_string += ','.join(outDict['unrolled_data_raw']['uv_unrolled_raw'])
+            final_string += '<uv_unrolled_raw>' + '\n'
+            final_string += ','.join(outDict['mesh']['unrolled_data_raw']['uv_unrolled_raw'])
             final_string += '\n'
-            final_string += '</UV_2D>' + '\n'
+            final_string += '</uv_unrolled_raw>' + '\n'
 
             strarr = list()
-            final_string += '<NORMALS_UNROLLED>' + '\n'
-            for p in outDict['mesh']['normals_unrolled']:
-                strarr.append(','.join([str(e) for e in p]))
-            final_string += ','.join(strarr)
+            final_string += '<normals_unrolled_raw>' + '\n'
+            final_string += ','.join(outDict['mesh']['unrolled_data_raw']['normals_unrolled_raw'])
             final_string += '\n'
-            final_string += '</NORMALS_UNROLLED>' + '\n'
-
-            strarr = list()
-            final_string += '<UV_UNROLLED>' + '\n'
-            for p in outDict['mesh']['uv_unrolled']:
-                strarr.append(','.join([str(e) for e in p]))
-            final_string += ','.join(strarr)
-            final_string += '\n'
-            final_string += '</UV_UNROLLED>' + '\n'
-
-            strarr = list()
-            final_string += '<POINTS_UNROLLED>' + '\n'
-            for p in outDict['mesh']['points_unrolled']:
-                strarr.append(','.join([str(e) for e in p]))
-            final_string += ','.join(strarr)
-            final_string += '\n'
-            final_string += '</POINTS_UNROLLED>' + '\n'
+            final_string += '</normals_unrolled_raw>' + '\n'
 
             if outDict['type'] == 'skinned':
                 final_string += '<CONNECTIONS>' + '\n'
@@ -1468,7 +1450,6 @@ class FbxParser:
                 for p in outDict['posenodes']:
                     final_string += '<POSENODE>' + '\n'
                     final_string += 'name: ' + p['name'] + '\n'
-
                     final_string += 'matrix: ' + ','.join([str(e) for e in p['matrix']]) + '\n'
 
                     final_string += '</POSENODE>' + '\n'
@@ -1487,9 +1468,10 @@ class FbxParser:
 
                 '''The Following lists contain the Deformers-indices and weights, which affects each vertex of the model'''
 
+
                 strarr = list()
                 final_string += '<WEIGHTS>' + '\n'
-                for p in outDict['mesh']['weight_unrolled']:
+                for p in outDict['mesh']['unrolled_data']['weights_unrolled']:
                     strarr.append(','.join([str(e) for e in p]))
                 final_string += '\\'.join(strarr)
                 final_string += '\n'
@@ -1497,7 +1479,7 @@ class FbxParser:
 
                 strarr = list()
                 final_string += '<INDICES>' + '\n'
-                for p in outDict['mesh']['index_unrolled']:
+                for p in outDict['mesh']['unrolled_data']['indices_unrolled']:
                     strarr.append(','.join([str(e) for e in p]))
                 final_string += '\\'.join(strarr)
                 final_string += '\n'
