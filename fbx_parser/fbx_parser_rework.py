@@ -1310,7 +1310,7 @@ class FbxParser:
 
         # optimised version
         #mesh['rolled_data']['points_3d'] = []  # list of tuple for x,y,z
-       # mesh['rolled_data']['uv_2d'] = []  # list of tuple for x,y
+        #mesh['rolled_data']['uv_2d'] = []  # list of tuple for x,y
         #mesh['rolled_data']['normals_3d'] = []  # list of tuple for x,y
         #mesh['indices']['pointsi'] = mesh['pointsi']  # list of tuple for x,y
         #mesh['indices']['uvi'] = mesh['uvi']  # list of tuple for x,y
