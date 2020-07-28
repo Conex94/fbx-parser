@@ -696,7 +696,7 @@ class FBX_MAP_READER:
             keystr = arguments[i+0]
             args_dict.update({keystr: arguments[i+1]})
 
-        filenamein = "fuck.fbx"
+        filenamein = "simplemap.fbx"
         filenameout = filenamein.split('.')[0]
 
         fbx_file_scopes_as_string = dict()

@@ -1299,35 +1299,9 @@ class FbxParser:
             return
 
     def _write_output(self, outDict, path_out, filename_out):
-        with open('data.json', 'w') as f:
-            import json
-            f.write(json.dumps(outDict, indent=4, sort_keys=True))
-
-        #mesh['rolled_data'] = {}
-        #mesh['unrolled_data'] = {}
-        #mesh['unrolled_data_raw'] = {}
-        #mesh['indices'] = {}
-
-        # optimised version
-        #mesh['rolled_data']['points_3d'] = []  # list of tuple for x,y,z
-        #mesh['rolled_data']['uv_2d'] = []  # list of tuple for x,y
-        #mesh['rolled_data']['normals_3d'] = []  # list of tuple for x,y
-        #mesh['indices']['pointsi'] = mesh['pointsi']  # list of tuple for x,y
-        #mesh['indices']['uvi'] = mesh['uvi']  # list of tuple for x,y
-        #mesh['rolled_data']['index_indexed'] = []
-        #mesh['rolled_data']['weight_indexed'] = []
-
-        # not optimised version
-        #mesh['unrolled_data']['points_3d_unrolled'] = []  # list of tuple for x,y
-        #mesh['unrolled_data']['uv_2d_unrolled'] = []  # list of tuple for x,y
-        #mesh['unrolled_data']['normals_3d_unrolled'] = []  # list of tuple for x,y
-        #mesh['unrolled_data']['weights_unrolled'] = []
-        #mesh['unrolled_data']['indices_unrolled'] = []
-
-        # not optimised, raw lines
-        #mesh['unrolled_data_raw']['normals_unrolled_raw'] = []  # list of tuple for x,y
-        #mesh['unrolled_data_raw']['uv_unrolled_raw'] = []  # list of tuple for x,y
-        #mesh['unrolled_data_raw']['points_unrolled_raw'] = []  # list of tuple for x,y
+        #with open('data.json', 'w') as f:
+            #import json
+            #f.write(json.dumps(outDict, indent=4, sort_keys=True))
 
         if outDict['type'] == 'animation':
             final_string = ""
