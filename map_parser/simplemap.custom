@@ -60,7 +60,7 @@ parent: pCube3
 child: file1
 </RELATION>
 <RELATION>
-parent: file1
+parent: file16e6
 child: file1
 </RELATION>
 <RELATION>
