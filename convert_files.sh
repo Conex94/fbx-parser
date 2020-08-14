@@ -1,3 +1,5 @@
-python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_animation.fbx --outpath=testfiles//tests_meshanim_parser//output_files//animation --outfile=animation
-python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_skinned.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=skinned
-python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_sphere.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=sphere
+#python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_animation.fbx --outpath=testfiles//tests_meshanim_parser//output_files//animation --outfile=animation
+#python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_skinned.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=skinned
+#python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=test_sphere.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=sphere
+#python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=anim1.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=anim1
+python fbx_parser//fbx_parser_rework.py --inpath=testfiles//tests_meshanim_parser//input_files//fbxfiles --infile=neon.fbx --outpath=testfiles//tests_meshanim_parser//output_files//models --outfile=neon

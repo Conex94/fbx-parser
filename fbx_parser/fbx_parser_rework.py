@@ -63,7 +63,7 @@ class FbxParser:
 
         return {'posenodes' : nodes }
 
-    def _extractArray(self, lines : list(), indexmode : bool):
+    def _extractArray(self, lines, indexmode ):
         '''
         This list converts a list of lines to a list of floats/ints
         While also Translating the "indexed mode" from the fbx file,
@@ -116,7 +116,7 @@ class FbxParser:
             print(theindex)
             raise e
 
-    def _extractkeys(self, lines : list()):
+    def _extractkeys(self, lines: list):
         '''
         Extract keys, convert from... microseconds? to frames
         :param lines:
@@ -1212,6 +1212,7 @@ class FbxParser:
         :return:
         '''
         start = time.time()
+        print("pathin: {} filein: {}".format(arguments.path_in, arguments.filename_in))
         lines = self._open_file(arguments.path_in, arguments.filename_in)
 
         meshDict = {}
@@ -1534,5 +1535,5 @@ if __name__ == '__main__':
                         default="None", help='If this Animation is part of a specific Group, like \"Human\"')
 
     results = parser.parse_args()
-
+    print(results)
     fbxparser._convert_auto(results)
