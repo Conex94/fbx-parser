@@ -692,11 +692,23 @@ class FBX_MAP_READER:
     def run_map_parser(arguments):
         args_dict = dict()
 
-        for i in range(0, len(arguments), 2):
-            keystr = arguments[i+0]
-            args_dict.update({keystr: arguments[i+1]})
+        if len(arguments) < 2:
+            arguments.clear()
+            arguments.append('-if')
+            arguments.append('simplemap.fbx')
 
-        filenamein = "simplemap.fbx"
+        for i in range(0, len(arguments), 2):
+            if '-if' in arguments[i+0]:
+                keystr = arguments[i+0]
+                args_dict.update({keystr: arguments[i+1]})
+            else:
+                print('Missing argument: -if')
+                print('Arguments are: {}'.format(args_dict))
+                exit(1)
+
+        print(args_dict)
+
+        filenamein = args_dict['-if']
         filenameout = filenamein.split('.')[0]
 
         fbx_file_scopes_as_string = dict()
@@ -735,7 +747,7 @@ class FBX_MAP_READER:
 
         lines = FBX_MAP_READER.dict_to_lines(out_dict)
 
-        for i in  range(0, len(lines)):
+        for i in range(0, len(lines)):
             lines[i] += "\n"
 
         with open(filenameout + ".json", 'w') as d:
