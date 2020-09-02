@@ -1211,9 +1211,18 @@ class FbxParser:
         :param lines:
         :return:
         '''
+
+        if 'filename_in' not in arguments or 'filename_out' not in arguments:
+            print("No in or outfile specified")
+
+            for keys, values in vars(arguments).items():
+                print(keys)
+                print(values)
+            exit(-1)
+
         start = time.time()
-        print("pathin: {} filein: {}".format(arguments.path_in, arguments.filename_in))
-        lines = self._open_file(arguments.path_in, arguments.filename_in)
+
+        lines = self._open_file(arguments.filename_in)
 
         meshDict = {}
         meshWorks = False
@@ -1263,7 +1272,7 @@ class FbxParser:
             out_dict['group'] = arguments.group
 
             #self._write_file(json.dumps(out_dict, indent=4), arguments.path_out, arguments.filename_out + '.anim')
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
+            self._write_output(out_dict, arguments.filename_out)
             end = time.time()
             print("Done Converting file: Time Taken: {}".format(end - start))
             return
@@ -1277,7 +1286,7 @@ class FbxParser:
             out_dict['materialfile'] = matFilename
             out_dict['type'] = 'static'
 
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
+            self._write_output(out_dict, arguments.filename_out)
 
             end = time.time()
             print("Done Converting file: Time Taken: {}".format(end - start))
@@ -1293,13 +1302,13 @@ class FbxParser:
             out_dict['materialfile'] = matFilename
             out_dict['type'] = 'skinned'
 
-            self._write_output(out_dict, arguments.path_out, arguments.filename_out)
+            self._write_output(out_dict, arguments.filename_out)
 
             end = time.time()
             print("Done Converting file: Time Taken: {}".format(end - start))
             return
 
-    def _write_output(self, outDict, path_out, filename_out):
+    def _write_output(self, outDict, filename_out):
         #with open('data.json', 'w') as f:
             #import json
             #f.write(json.dumps(outDict, indent=4, sort_keys=True))
@@ -1375,7 +1384,7 @@ class FbxParser:
 
                 final_string += '</DEFORMER>\n'
 
-            full_name = os.path.join(path_out,filename_out)  + '.anim'
+            full_name = filename_out + '.anim'
             with open(full_name, 'w') as fout:
                 fout.write(final_string)
 
@@ -1460,15 +1469,15 @@ class FbxParser:
                 final_string += '\n'
                 final_string += '</INDICES>' + '\n'
 
-                full_name = os.path.join(path_out, filename_out) + '.mesh'
+                full_name = filename_out + '.mesh'
                 with open(full_name, 'w') as fout:
                     fout.write(final_string)
 
-            full_name = os.path.join(path_out, filename_out) + '.mesh'
+            full_name = filename_out + '.mesh'
             with open(full_name, 'w') as fout:
                 fout.write(final_string)
 
-    def _open_file(self, path, filename) -> list():
+    def _open_file(self, filename) -> list():
         '''
         Open the FBX file
         :param path: file path
@@ -1477,12 +1486,10 @@ class FbxParser:
         '''
 
         start = time.time()
-
         #add the .fbx if it isnt in the name
         if not '.fbx' in filename:
             filename = "{}{}".format(filename, '.fbx')
-
-        pathname = os.path.join(path, filename)
+        pathname = filename
 
         with open(pathname, 'r') as fin:
             file_lines = fin.readlines()
@@ -1516,14 +1523,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('--inpath', action='store', dest='path_in',
-                        default=".", help='Select the path of the file to parse')
-
     parser.add_argument('--infile', action='store', dest='filename_in',
                         default="None.fbx", help='Select the file to parse')
-
-    parser.add_argument('--outpath', action='store', dest='path_out',
-                        default=".", help='Choose the output folder')
 
     parser.add_argument('--outfile', action='store', dest='filename_out',
                         default=".", help='Enter the target filename')
@@ -1535,5 +1536,5 @@ if __name__ == '__main__':
                         default="None", help='If this Animation is part of a specific Group, like \"Human\"')
 
     results = parser.parse_args()
-    print(results)
+
     fbxparser._convert_auto(results)
