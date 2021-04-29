@@ -725,7 +725,6 @@ class FbxParser:
         connectionopen = False
 
         for i in range(0, wholelines.__len__() - 1):
-
             if "Connections:  {" in wholelines[i]:
                 bracket_counter += 1
                 connectionopen = True
