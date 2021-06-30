@@ -1,1 +1,1 @@
-python fbx_parser//fbx_parser_rework.py --infile=testfiles//tests_meshanim_parser//input_files//fbxfiles//1x1x1_cube_l.fbx --outfile=testfiles//tests_meshanim_parser//output_files//models//1x1x1_cube_l
+python fbx_parser//fbx_parser_rework.py --infile=testfiles//tests_meshanim_parser//input_files//fbxfiles//terrain.fbx --ouestfiles//tests_meshanim_parser//output_files//models//terraintfile=t

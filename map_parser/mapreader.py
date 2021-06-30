@@ -695,7 +695,7 @@ class FBX_MAP_READER:
         if len(arguments) < 2:
             arguments.clear()
             arguments.append('-if')
-            arguments.append('simplemap.fbx')
+            arguments.append('shadowtest.fbx')
 
         for i in range(0, len(arguments), 2):
             if '-if' in arguments[i+0]:
